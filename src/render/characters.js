@@ -1,8 +1,16 @@
 import { RENDER } from '../data/balance.js';
 import { Activity } from '../sim/employee.js';
+import { SHEETS, drawTile } from './assets.js';
 
-// Placeholder postavičky kreslené kódom (GDD 2.3C): 3 smery (dole, hore, bok – zrkadlený),
-// chôdza, sedenie pri stole, záchvat, spánok. Neskôr ich nahradí spritesheet.
+// Postavičky (GDD 2.3C): Kenney RPG Urban Pack – 6 postáv, 4 smery, 3 snímky chôdze.
+// Bez spritesheetu sa kreslí náhradná postavička kódom.
+
+/** RPG Urban Pack: postavy sú v stĺpcoch 23–26, každá zaberá 3 riadky (snímky chôdze). */
+const URBAN_CHAR = { FIRST_COL: 23, ROWS_PER_CHAR: 3 };
+/** Stĺpec podľa smeru pohľadu. */
+const DIR_COL = { left: 0, down: 1, up: 2, right: 3 };
+/** Poradie snímok pri chôdzi: stoj, krok, stoj, druhý krok. */
+const WALK_CYCLE = [0, 1, 0, 2];
 
 const S = RENDER.TILE_SIZE;
 const PANTS = '#2a2d36';
@@ -19,8 +27,37 @@ const SITTING = new Set([Activity.WORKING, Activity.HYPERACTIVE, Activity.STRIKE
  * @param {CanvasRenderingContext2D} ctx
  * @param {import('../sim/employee.js').Employee} e
  * @param {number} time sekundy (na animácie)
+ * @param {import('./assets.js').Assets} assets
  */
-export function drawEmployee(ctx, e, time) {
+export function drawEmployee(ctx, e, time, assets) {
+  if (assets.urban) drawSpriteEmployee(ctx, e, time, assets.urban);
+  else drawFallbackEmployee(ctx, e, time);
+}
+
+function drawSpriteEmployee(ctx, e, time, image) {
+  let cx = Math.round(e.x * S + S / 2);
+  let feet = Math.round(feetY(e));
+  const walking = e.isWalking;
+  const sitting = !walking && SITTING.has(e.activity) && e.facing === 'up';
+  if (sitting) feet -= 3;
+  if (e.activity === Activity.DRAMA_QUEEN) cx += Math.round(Math.sin(time * 40));
+  if (e.activity === Activity.ASLEEP) feet += 1;
+  const hyper = e.activity === Activity.HYPERACTIVE;
+
+  let frame = 0;
+  if (walking) frame = WALK_CYCLE[Math.floor(time * 8) % WALK_CYCLE.length];
+  else if (hyper || e.activity === Activity.DRAMA_QUEEN) frame = 1 + (Math.floor(time * 10) % 2);
+  // Pri spánku a záchvate sa otočí k hráčovi.
+  const facing = [Activity.ASLEEP, Activity.DRAMA_QUEEN].includes(e.activity) ? 'down' : e.facing;
+  const row = (e.look.sprite ?? 0) * URBAN_CHAR.ROWS_PER_CHAR + frame;
+  const id = row * SHEETS.urban.cols + URBAN_CHAR.FIRST_COL + DIR_COL[facing];
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+  ctx.fillRect(cx - 4, feet - 1, 8, 2);
+  drawTile(ctx, image, SHEETS.urban, id, cx - 8, feet - 15);
+}
+
+function drawFallbackEmployee(ctx, e, time) {
   const { shirt, hair, skin } = e.look;
   let cx = Math.round(e.x * S + S / 2);
   let feet = Math.round(feetY(e));

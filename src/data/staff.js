@@ -67,7 +67,10 @@ export const NAMES = {
   },
 };
 
-/** Farby oblečenia pre placeholder postavy. */
+/** Počet postáv v Kenney RPG Urban Pack (každá: 4 smery × 3 snímky chôdze). */
+export const CHARACTER_VARIANTS = 6;
+
+/** Farby oblečenia pre náhradné postavy kreslené kódom. */
 export const SHIRT_COLORS = [
   '#4f7cc4',
   '#c45a4f',

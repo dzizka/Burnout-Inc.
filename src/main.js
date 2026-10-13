@@ -2,6 +2,7 @@ import { TIME } from './data/balance.js';
 import { FixedStepLoop } from './core/loop.js';
 import { Game } from './sim/game.js';
 import { Renderer } from './render/renderer.js';
+import { loadAssets } from './render/assets.js';
 import { Hud } from './ui/hud.js';
 import { BuildMenu } from './ui/buildMenu.js';
 import { StaffPanel } from './ui/staffPanel.js';
@@ -19,6 +20,8 @@ const game = new Game();
 game.setupStarterOffice();
 const renderer = new Renderer(document.getElementById('gameCanvas'));
 renderer.centerOn(game.floors[0]);
+// Hra beží hneď s náhradnou grafikou; spritesheety sa doplnia po načítaní.
+loadAssets().then((assets) => renderer.setAssets(assets));
 
 let lastFrame = null;
 const loop = new FixedStepLoop({

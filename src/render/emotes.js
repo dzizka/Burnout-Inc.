@@ -1,8 +1,27 @@
 import { RENDER } from '../data/balance.js';
 import { Activity } from '../sim/employee.js';
 import { feetY } from './characters.js';
+import { SHEETS, drawTile } from './assets.js';
 
-// Plávajúce stavové ikony nad hlavou (GDD 2.3C) – 7×7 pixel art v bubline.
+// Plávajúce stavové ikony nad hlavou (GDD 2.3C). Bublina a väčšina ikon je z Kenney
+// Emotes Pack; čo tam nie je (káva, jedlo, cigareta, lietadielko), dokreslíme 7×7 pixelmi
+// do prázdnej bubliny. Bez spritesheetu sa kreslí celá bublina kódom.
+
+/** Kenney Emotes Pack (pixel style 1) – poradové čísla dlaždíc. */
+const KENNEY_EMOTE = {
+  bubble: 0,
+  dots: 3,
+  bang: 7,
+  question: 9,
+  zzz: 11,
+  sweat: 12,
+  bolt: 18,
+  ball: 19,
+  drop: 20,
+  dollar: 23,
+  plane: 28, // „HAHA“ – prank
+  smoke: 29, // obláčik dymu
+};
 
 const S = RENDER.TILE_SIZE;
 
@@ -71,12 +90,33 @@ export function emoteFor(e) {
   return null;
 }
 
-/** @param {CanvasRenderingContext2D} ctx */
-export function drawEmote(ctx, e, time) {
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {import('./assets.js').Assets} assets
+ */
+export function drawEmote(ctx, e, time, assets) {
   const emote = emoteFor(e);
   if (!emote) return;
   const cx = Math.round(e.x * S + S / 2);
   const float = Math.round(Math.sin(time * 3 + e.id) * 1);
+  if (assets.emotes) {
+    const x = cx - 8;
+    const y = Math.round(feetY(e)) - 31 + float;
+    const kenney = KENNEY_EMOTE[emote.icon];
+    if (kenney !== undefined) {
+      drawTile(ctx, assets.emotes, SHEETS.emotes, kenney, x, y);
+    } else {
+      drawTile(ctx, assets.emotes, SHEETS.emotes, KENNEY_EMOTE.bubble, x, y);
+      // Kenney bublina je biela – biele pixely ikony prefarbíme na sivú.
+      drawPixels(ctx, ICONS[emote.icon], x + 4, y + 3, { w: '#8a8f99' });
+    }
+    if (emote.alert) {
+      // Červená bodka = problém, ktorý by mal hráč riešiť.
+      ctx.fillStyle = '#e0533f';
+      ctx.fillRect(x + 12, y + 1, 3, 3);
+    }
+    return;
+  }
   const x = cx - 5;
   const y = Math.round(feetY(e)) - 28 + float;
   // bublina s chvostíkom
@@ -87,13 +127,16 @@ export function drawEmote(ctx, e, time) {
   ctx.fillRect(x + 5, y + 12, 1, 1);
   ctx.fillStyle = '#f4f1ea';
   ctx.fillRect(x + 1, y + 1, 9, 9);
-  const rows = ICONS[emote.icon];
+  drawPixels(ctx, ICONS[emote.icon], x + 2, y + 2);
+}
+
+function drawPixels(ctx, rows, x, y, overrides = {}) {
   for (let r = 0; r < rows.length; r++) {
     for (let c = 0; c < rows[r].length; c++) {
       const ch = rows[r][c];
       if (ch === '.') continue;
-      ctx.fillStyle = COLORS[ch];
-      ctx.fillRect(x + 2 + c, y + 2 + r, 1, 1);
+      ctx.fillStyle = overrides[ch] ?? COLORS[ch];
+      ctx.fillRect(x + c, y + r, 1, 1);
     }
   }
 }
