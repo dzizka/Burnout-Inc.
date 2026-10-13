@@ -38,6 +38,7 @@ export class Studio {
     this.products = [];
     this.pendingTickets = 0;
     this.ticketsHandled = 0;
+    this.launchedCount = 0;
     this.nextId = 1;
   }
 
@@ -116,6 +117,7 @@ export class Studio {
       totalRevenue: 0,
     };
     this.products.push(product);
+    this.launchedCount++;
     this.project = null;
 
     // Trh (GDD 7.1): dobrý produkt berie podiel rivalovi, zlý spôsobí škandál.

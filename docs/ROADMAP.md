@@ -36,11 +36,13 @@ pokračujú poschodia, rival, Black Ops a meta-progres.
 - Tikety, zvoniaci stôl podpory, hluk, hotfixy živých produktov
 - 3 typy produktov kampane 1 × 3 biznis modely, panel Projekty
 
-## M4 – Ekonomika & uloženie (GDD fáza 4)
+## M4 – Ekonomika & uloženie (GDD fáza 4) ✅
 
 - Mesačná uzávierka: mzdy (D5), nájom, splátky úverov (D13), bankrot s lehotou (D12)
 - Škandál meter a jeho dôsledky
-- Save/Load do localStorage (verziovaný formát)
+- Save/Load do localStorage (verziovaný formát), automaticky každý týždeň
+- Panel Financie (klik na hotovosť), PR kampaň, obetný baránok, koniec hry
+- Lounge gauč (Zábava) – bez neho sólo zakladateľ štrajkuje z nudy
 
 ## Neskôr
 

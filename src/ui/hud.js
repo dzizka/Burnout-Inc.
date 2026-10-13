@@ -1,4 +1,5 @@
 import { TIME } from '../data/balance.js';
+import { signed } from './financePanel.js';
 import { t, formatMoney, getLocale, setLocale, onLocaleChange, LOCALES } from '../i18n/index.js';
 
 // HTML/DOM overlay nad canvasom (GDD 8.1, 8.4).
@@ -61,7 +62,11 @@ export class Hud {
       .querySelectorAll('#bottom-dock button:not(#tab-build):not(#tab-staff):not(#tab-rd)')
       .forEach((btn) => btn.addEventListener('click', () => this.toast(t('toast.comingSoon'))));
 
-    game.events.on('month:end', ({ month }) => this.toast(t('toast.monthEnd', { month })));
+    game.events.on('month:end', ({ month, report, warning }) => {
+      this.toast(
+        warning ? t('finance.warning') : t('toast.monthEnd', { month, net: signed(report.net) }),
+      );
+    });
 
     onLocaleChange(() => {
       applyTranslations();

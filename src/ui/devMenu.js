@@ -1,7 +1,7 @@
 import { TIME } from '../data/balance.js';
 
 // Skryté vývojárske menu (GDD 10.3). Otvára sa klávesou ~ / ` alebo Ctrl+Shift+D,
-// na mobile trojitým ťuknutím na hotovosť. Je to nástroj pre vývoj, preto texty
+// na mobile trojitým ťuknutím na dátum. Je to nástroj pre vývoj, preto texty
 // nejdú cez i18n.
 
 const TRIPLE_TAP_MS = 500;
@@ -59,7 +59,7 @@ export class DevMenu {
         this.toggle();
       }
     });
-    document.getElementById('cash-display').addEventListener('pointerdown', () => {
+    document.getElementById('calendar').addEventListener('pointerdown', () => {
       this.tapCount++;
       clearTimeout(this.tapTimer);
       this.tapTimer = setTimeout(() => (this.tapCount = 0), TRIPLE_TAP_MS);
