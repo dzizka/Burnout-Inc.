@@ -134,6 +134,10 @@ ladenie → 5 produktov so skóre 9,3, škandál 0,4 %, trh 19 %; vydávanie hne
   uzávierky** (1 mesiac = 3 min pri 1x).
 - Ak je zostatok záporný aj pri ďalšej uzávierke, nastáva **bankrot**.
 - Dĺžka lehoty je v `ECONOMY.BANKRUPTCY_GRACE_MONTHS` a doladí sa spolu s D6 počas playtestu.
+- Implementované v M4 (`src/sim/economy.js`). Nájom suterénu 600 €/mesiac, štart 3 000 €,
+  spoluzakladateľ s platom 600 €/mesiac. Simulácia `npm run sim -- 6 1 garage`: po nákupe
+  vybavenia klesne hotovosť v 1. mesiaci na ~600 €, od 2. mesiaca firma zarába
+  +700 až +2 100 €/mesiac. Stratégia „vydávať hneď“ (`studio ship`) skrachuje v 2. mesiaci.
 
 ## D13 – Bankový úver · rozhodnuté (ladí sa)
 
@@ -146,6 +150,8 @@ preto má úver aj **povinné splácanie**:
   sa nedalo donekonečna žiť na dlh.
 - Nesplatená splátka sa počíta ako záporný zostatok (D12).
 - Alternatíva bez splátok je Venture Capital (GDD 9.2) s trvalou stratou podielu zo zisku.
+- Implementované v M4: max. 3 súbežné úvery, splátky pri mesačnej uzávierke, príjem
+  z úveru sa nepočíta do čistého zisku vo výkaze. Venture Capital zatiaľ nie je.
 
 ## Ďalšie drobnosti
 

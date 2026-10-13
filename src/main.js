@@ -7,6 +7,9 @@ import { Hud } from './ui/hud.js';
 import { BuildMenu } from './ui/buildMenu.js';
 import { StaffPanel } from './ui/staffPanel.js';
 import { ProjectsPanel } from './ui/projectsPanel.js';
+import { FinancePanel } from './ui/financePanel.js';
+import { GameMenu } from './ui/gameMenu.js';
+import { loadGame, saveGame } from './ui/storage.js';
 import { Inspector } from './ui/inspector.js';
 import { DevMenu } from './ui/devMenu.js';
 import { InputController } from './ui/input.js';
@@ -17,8 +20,14 @@ import { detectLocale, setLocale, t } from './i18n/index.js';
 const settings = loadSettings();
 setLocale(detectLocale(settings.locale ?? null, navigator.languages ?? [navigator.language]));
 
-const game = new Game();
-game.setupStarterOffice();
+// Uložená hra má prednosť; inak nová garáž so spoluzakladateľom.
+const game =
+  loadGame() ??
+  (() => {
+    const fresh = new Game();
+    fresh.setupStarterOffice();
+    return fresh;
+  })();
 const renderer = new Renderer(document.getElementById('gameCanvas'));
 renderer.centerOn(game.floors[0]);
 // Hra beží hneď s náhradnou grafikou; spritesheety sa doplnia po načítaní.
@@ -37,6 +46,7 @@ const loop = new FixedStepLoop({
     hud.refresh();
     inspector.refresh();
     projectsPanel.refresh();
+    financePanel.refresh();
   },
 });
 
@@ -50,23 +60,20 @@ const staffPanel = new StaffPanel(game, hud, {
     staffPanel.close();
     inspector.select(employee);
   },
-  onOpen: () => {
-    buildMenu.close();
-    projectsPanel.close();
-    inspector.select(null);
-  },
+  onOpen: () => closePanels(staffPanel),
 });
-const projectsPanel = new ProjectsPanel(game, hud, {
-  onOpen: () => {
-    buildMenu.close();
-    staffPanel.close();
-    inspector.select(null);
-  },
-});
-buildMenu.onOpen = () => {
-  staffPanel.close();
-  projectsPanel.close();
-};
+const projectsPanel = new ProjectsPanel(game, hud, { onOpen: () => closePanels(projectsPanel) });
+const financePanel = new FinancePanel(game, hud, { onOpen: () => closePanels(financePanel) });
+const gameMenu = new GameMenu(game, hud, { onOpen: () => closePanels(gameMenu) });
+buildMenu.onOpen = () => closePanels(buildMenu);
+
+/** Naraz je otvorený len jeden panel. */
+function closePanels(except) {
+  for (const panel of [buildMenu, staffPanel, projectsPanel, financePanel, gameMenu]) {
+    if (panel !== except && panel.isOpen) panel.close();
+  }
+  if (except !== null) inspector.select(null);
+}
 bindEventToasts(game, hud);
 
 const input = new InputController(renderer, {
@@ -84,6 +91,8 @@ const input = new InputController(renderer, {
     if (buildMenu.mode || buildMenu.isOpen) buildMenu.cancel();
     else if (staffPanel.isOpen) staffPanel.close();
     else if (projectsPanel.isOpen) projectsPanel.close();
+    else if (financePanel.isOpen) financePanel.close();
+    else if (gameMenu.isOpen) gameMenu.close();
     else inspector.select(null);
   },
 });
@@ -92,6 +101,13 @@ new DevMenu({ game, loop, renderer });
 window.addEventListener('resize', () => {
   renderer.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio || 1);
   renderer.centerOn(game.floors[0]);
+});
+
+// Automatické ukladanie každý herný týždeň a pri odchode zo stránky.
+game.events.on('week:end', () => saveGame(game));
+window.addEventListener('pagehide', () => saveGame(game));
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') saveGame(game);
 });
 
 loop.start((cb) => requestAnimationFrame(cb));

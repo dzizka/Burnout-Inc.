@@ -72,6 +72,16 @@ export const OBJECTS = {
     interaction: { dx: 0, dy: 1 },
     need: 'peace',
   },
+  couch: {
+    // GDD 5.5 – Lounge gauč: rýchlo dopĺňa Zábavu (a trochu Pokoj).
+    id: 'couch',
+    category: 'relax',
+    width: 2,
+    height: 1,
+    price: 400,
+    interaction: { dx: 0, dy: 1 },
+    need: 'fun',
+  },
 };
 
 /** Podiel z ceny, ktorý sa vráti pri predaji objektu. */

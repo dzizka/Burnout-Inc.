@@ -1,4 +1,5 @@
 import { NEED_KEYS, PLAYER_ACTIONS } from '../data/needs.js';
+import { SCANDAL } from '../data/balance.js';
 import { t, formatMoney, onLocaleChange } from '../i18n/index.js';
 import { applyTranslations } from './hud.js';
 
@@ -50,6 +51,12 @@ export class Inspector {
       game.fire(this.employee);
       this.hud.toast(t('toast.fired', { name }));
     });
+    this.el.querySelector('#btn-scapegoat').addEventListener('click', () => {
+      if (!this.employee) return;
+      const name = this.employee.name;
+      game.scapegoat(this.employee);
+      this.hud.toast(t('toast.scapegoat', { name }));
+    });
     game.events.on('employee:fired', ({ employee }) => {
       if (employee === this.employee) this.select(null);
     });
@@ -77,6 +84,9 @@ export class Inspector {
       this.el.querySelector('#btn-bonus'),
       t('inspect.bonus', { amount: formatMoney(PLAYER_ACTIONS.BONUS_COST) }),
     );
+    const scapegoat = this.el.querySelector('#btn-scapegoat');
+    scapegoat.hidden = this.game.scandal <= 0;
+    setText(scapegoat, t('inspect.scapegoat', { reduction: SCANDAL.SCAPEGOAT_REDUCTION }));
     for (const need of NEED_KEYS) {
       const v = e.stats[need];
       const fill = this.bars[need];

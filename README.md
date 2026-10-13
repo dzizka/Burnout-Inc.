@@ -23,13 +23,25 @@ npm run sim      # balansová simulácia kancelárie bez prehliadača
 
 Na mobile v rovnakej sieti: `npm run dev -- --host` a otvor zobrazenú IP adresu.
 
-## Ovládanie (zatiaľ)
+## Ovládanie
 
-| Akcia                 | PC              | Mobil          |
-| --------------------- | --------------- | -------------- |
-| Pauza / pokračovať    | `Space`         | tlačidlo ❚❚    |
-| Rýchlosť 1x / 2x / 3x | `1` / `2` / `3` | tlačidlá ▶     |
-| Prepnúť jazyk         | tlačidlo SK/EN  | tlačidlo SK/EN |
+| Akcia                  | PC                           | Mobil                       |
+| ---------------------- | ---------------------------- | --------------------------- |
+| Pauza / pokračovať     | `Space`                      | tlačidlo ❚❚                 |
+| Rýchlosť 1x / 2x / 3x  | `1` / `2` / `3`              | tlačidlá ▶                  |
+| Posun kamery           | ťahanie myšou / WASD / šípky | ťahanie prstom              |
+| Zoom                   | koliesko / `+` `-`           | dva prsty (pinch)           |
+| Stavať / predať        | Stavať → predmet → klik      | Stavať → predmet → ťuknutie |
+| Karta zamestnanca      | klik na postavu              | ťuknutie na postavu         |
+| Nábor                  | Personál → Najať             | Personál → Najať            |
+| Vývoj produktu         | Projekty                     | Projekty                    |
+| Financie, úver, PR     | klik na hotovosť             | ťuknutie na hotovosť        |
+| Uložiť / nová hra      | ☰                           | ☰                          |
+| Prepnúť jazyk          | SK/EN                        | SK/EN                       |
+| Zrušiť režim / zavrieť | `Esc`                        | ×                           |
+| Vývojárske menu        | `~` alebo Ctrl+Shift+D       | 3× ťuknúť na dátum          |
+
+Hra sa ukladá automaticky každý herný týždeň a pri zatvorení stránky.
 
 ## Technológie
 

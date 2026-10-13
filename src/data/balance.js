@@ -20,8 +20,12 @@ export const TIME = {
 };
 
 export const ECONOMY = {
-  /** GDD 9.6 – štartovací kapitál (prebalansovať s mesačnými mzdami v M4). */
-  STARTING_CASH: 2500,
+  /** GDD 9.6 – štartovací kapitál; vyladené simuláciou (npm run sim). */
+  STARTING_CASH: 3000,
+  /** GDD 9.3 – nájom suterénu (Tier 1) za mesiac. */
+  RENT_PER_MONTH: 600,
+  /** GDD 9.3 – každá uvarená káva stojí firmu. */
+  COFFEE_COST: 2,
   /** D12 – pod týmto zostatkom sa nedá nič kúpiť. */
   OVERDRAFT_LIMIT: -2000,
   /** D12 – počet mesačných uzávierok v mínuse, po ktorých nastane bankrot. */
@@ -35,7 +39,31 @@ export const ECONOMY = {
     TERM_MONTHS: 6,
     /** Každý ďalší súbežný úver má úrok vyšší o túto hodnotu. */
     INTEREST_STEP_PER_LOAN: 0.02,
+    /** Viac súbežných úverov banka nedá. */
+    MAX_ACTIVE: 3,
   },
+};
+
+/** GDD 6.5 – škandál meter a nástroje na jeho hasenie. */
+export const SCANDAL = {
+  /** Od tohto prahu: mediálny šum, predaje klesajú. */
+  MEDIA: 40,
+  MEDIA_REVENUE_FACTOR: 0.8,
+  /** Od tohto prahu: razie a pokuty pri každej mesačnej uzávierke. */
+  RAID: 70,
+  RAID_REVENUE_FACTOR: 0.5,
+  RAID_FINE: 800,
+  /** 100 % = likvidácia firmy (koniec hry). */
+  LIQUIDATION: 100,
+  /** Prirodzené vyprchanie za pracovný deň. */
+  DECAY_PER_DAY: 0.3,
+  /** GDD 9.4 – PR kampaň zníži škandál; cena rastie s úrovňou škandálu. */
+  PR_REDUCTION: 20,
+  PR_BASE_COST: 1000,
+  PR_COST_PER_PERCENT: 0.04, // cena = základ × (1 + škandál × 0,04)
+  /** GDD 6.5 – obetný baránok: −30 % škandálu, morálka tímu na polovicu. */
+  SCAPEGOAT_REDUCTION: 30,
+  SCAPEGOAT_MORALE_FACTOR: 0.5,
 };
 
 export const MARKET = {
