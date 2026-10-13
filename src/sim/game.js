@@ -118,7 +118,8 @@ export class Game {
 
   generateCandidate() {
     const rng = this.rng;
-    const pool = rng.chance(0.5) ? NAMES.male : NAMES.female;
+    const gender = rng.chance(0.5) ? 'm' : 'f';
+    const pool = gender === 'm' ? NAMES.male : NAMES.female;
     const [minSkill, maxSkill] = SKILL_RANGE;
     const skill = Math.round((minSkill + rng.next() * (maxSkill - minSkill)) * 100) / 100;
     const [minWage, maxWage] = WAGE_RANGE;
@@ -131,6 +132,7 @@ export class Game {
     }
     return {
       name: `${rng.pick(pool.first)} ${rng.pick(pool.last)}`,
+      gender,
       skill,
       wage,
       decayFactors,

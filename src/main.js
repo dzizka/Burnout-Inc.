@@ -4,15 +4,19 @@ import { Game } from './sim/game.js';
 import { Renderer } from './render/renderer.js';
 import { Hud } from './ui/hud.js';
 import { BuildMenu } from './ui/buildMenu.js';
+import { StaffPanel } from './ui/staffPanel.js';
+import { Inspector } from './ui/inspector.js';
 import { DevMenu } from './ui/devMenu.js';
 import { InputController } from './ui/input.js';
+import { bindEventToasts } from './ui/eventToasts.js';
 import { loadSettings, saveSettings } from './ui/settings.js';
-import { detectLocale, setLocale } from './i18n/index.js';
+import { detectLocale, setLocale, t } from './i18n/index.js';
 
 const settings = loadSettings();
 setLocale(detectLocale(settings.locale ?? null, navigator.languages ?? [navigator.language]));
 
 const game = new Game();
+game.setupStarterOffice();
 const renderer = new Renderer(document.getElementById('gameCanvas'));
 renderer.centerOn(game.floors[0]);
 
@@ -25,8 +29,9 @@ const loop = new FixedStepLoop({
     input.update(lastFrame === null ? 0 : Math.min((now - lastFrame) / 1000, 0.1));
     lastFrame = now;
     buildMenu.updateOverlay();
-    renderer.render(game);
+    renderer.render(game, now / 1000);
     hud.refresh();
+    inspector.refresh();
   },
 });
 
@@ -34,10 +39,36 @@ const hud = new Hud(game, loop, {
   onLocaleSelected: (locale) => saveSettings({ locale }),
 });
 const buildMenu = new BuildMenu(game, renderer, hud);
+const inspector = new Inspector(game, renderer, hud);
+const staffPanel = new StaffPanel(game, hud, {
+  onSelect: (employee) => {
+    staffPanel.close();
+    inspector.select(employee);
+  },
+  onOpen: () => {
+    buildMenu.close();
+    inspector.select(null);
+  },
+});
+buildMenu.onOpen = () => staffPanel.close();
+bindEventToasts(game, hud);
+
 const input = new InputController(renderer, {
-  onTap: (tile) => buildMenu.onTap(tile),
+  onTap: (tile, world) => {
+    if (buildMenu.mode) {
+      buildMenu.onTap(tile);
+      return;
+    }
+    const employee = renderer.employeeAt(game, world);
+    if (employee?.calmDown(game)) hud.toast(t('toast.calmed', { name: employee.name }));
+    inspector.select(employee);
+  },
   onHover: (tile) => buildMenu.onHover(tile),
-  onCancel: () => buildMenu.cancel(),
+  onCancel: () => {
+    if (buildMenu.mode || buildMenu.isOpen) buildMenu.cancel();
+    else if (staffPanel.isOpen) staffPanel.close();
+    else inspector.select(null);
+  },
 });
 new DevMenu({ game, loop, renderer });
 

@@ -44,15 +44,17 @@ export class Employee {
    * @param {object} data
    * @param {number} data.id
    * @param {string} data.name
+   * @param {'m' | 'f'} data.gender pre slovenské tvary slovies v hláškach
    * @param {number} data.wage mesačná mzda (D5)
    * @param {number} data.skill násobok rýchlosti práce
    * @param {Record<string, number>} data.decayFactors individuálne násobky úbytku
    * @param {{ shirt: string, hair: string, skin: string }} data.look
    * @param {{ x: number, y: number }} data.position
    */
-  constructor({ id, name, wage, skill, decayFactors, look, position }) {
+  constructor({ id, name, gender, wage, skill, decayFactors, look, position }) {
     this.id = id;
     this.name = name;
+    this.gender = gender;
     this.wage = wage;
     this.skill = skill;
     this.decayFactors = decayFactors;

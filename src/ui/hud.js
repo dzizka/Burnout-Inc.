@@ -56,7 +56,7 @@ export class Hud {
     });
 
     document
-      .querySelectorAll('#bottom-dock button:not(#tab-build)')
+      .querySelectorAll('#bottom-dock button:not(#tab-build):not(#tab-staff)')
       .forEach((btn) => btn.addEventListener('click', () => this.toast(t('toast.comingSoon'))));
 
     game.events.on('month:end', ({ month }) => this.toast(t('toast.monthEnd', { month })));

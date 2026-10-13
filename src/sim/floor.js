@@ -101,13 +101,4 @@ export class Floor {
       if (this.occupancy[i] === obj.id) this.occupancy[i] = NONE;
     }
   }
-
-  /** Objekty zoradené na vykreslenie (Y-sorting, GDD 2.5). */
-  sortedObjects() {
-    return [...this.objects].sort((a, b) => {
-      const ay = a.y + OBJECTS[a.type].height;
-      const by = b.y + OBJECTS[b.type].height;
-      return ay - by || a.x - b.x;
-    });
-  }
 }

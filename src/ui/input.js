@@ -22,7 +22,7 @@ const PAN_KEYS = {
 export class InputController {
   /**
    * @param {import('../render/renderer.js').Renderer} renderer
-   * @param {{ onTap: (tile: {x: number, y: number}) => void,
+   * @param {{ onTap: (tile: {x: number, y: number}, world: {x: number, y: number}) => void,
    *           onHover: (tile: {x: number, y: number} | null) => void,
    *           onCancel: () => void }} handlers
    */
@@ -126,7 +126,7 @@ export class InputController {
     if (!p.dragging) {
       const tile = this.renderer.clientToTile(e.clientX, e.clientY);
       if (e.pointerType !== 'mouse') this.handlers.onHover(tile);
-      this.handlers.onTap(tile);
+      this.handlers.onTap(tile, this.renderer.clientToWorld(e.clientX, e.clientY));
     }
   }
 

@@ -28,6 +28,8 @@ export class BuildMenu {
     /** @type {null | { kind: 'place', type: string } | { kind: 'sell' }} */
     this.mode = null;
     this.hover = null;
+    /** Volá sa pri otvorení panelu (zavrie ostatné panely). */
+    this.onOpen = () => {};
 
     this.panel = document.getElementById('build-panel');
     this.list = document.getElementById('build-items');
@@ -54,6 +56,7 @@ export class BuildMenu {
   }
 
   open() {
+    this.onOpen();
     this.panel.hidden = false;
     this.dockButton.classList.add('active');
   }

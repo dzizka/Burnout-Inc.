@@ -18,6 +18,7 @@ npm run dev      # vývojový server s hot reloadom (http://localhost:5173)
 npm test         # unit testy simulácie (Vitest)
 npm run check    # lint + formát + testy + build (to isté ako CI)
 npm run build    # produkčný build do dist/
+npm run sim      # balansová simulácia kancelárie bez prehliadača
 ```
 
 Na mobile v rovnakej sieti: `npm run dev -- --host` a otvor zobrazenú IP adresu.
