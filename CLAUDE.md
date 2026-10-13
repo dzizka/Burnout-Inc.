@@ -47,3 +47,8 @@ Pred pridaním akéhokoľvek assetu skontroluj licenciu a zapíš ho do `docs/AS
 ## Jazyk
 
 UI a texty v hre: slovenčina (primárne) + angličtina. Komentáre v kóde a dokumentácia po slovensky.
+
+## Workflow
+
+- Každá zmena ide cez PR do `main`. Keď je CI zelené a nie sú otvorené pripomienky,
+  Claude PR zlúči sám (pokyn vlastníka repozitára).
