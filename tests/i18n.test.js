@@ -12,9 +12,9 @@ describe('i18n', () => {
   });
 
   it('dosadí parametre a prepne jazyk', () => {
-    expect(t('hud.day', { day: 3 })).toBe('Deň 3');
+    expect(t('cal.week', { week: 2 })).toBe('2. týždeň');
     setLocale('en');
-    expect(t('hud.day', { day: 3 })).toBe('Day 3');
+    expect(t('cal.week', { week: 2 })).toBe('week 2');
   });
 
   it('neznámy kľúč vráti samotný kľúč', () => {

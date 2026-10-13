@@ -59,7 +59,6 @@ export class Hud {
       .querySelectorAll('#bottom-dock button')
       .forEach((btn) => btn.addEventListener('click', () => this.toast(t('toast.comingSoon'))));
 
-    game.events.on('day:end', ({ day }) => this.toast(t('toast.dayEnd', { day })));
     game.events.on('month:end', ({ month }) => this.toast(t('toast.monthEnd', { month })));
 
     onLocaleChange(() => {
@@ -103,11 +102,15 @@ export class Hud {
     const { game, el } = this;
     setText(el.cash, formatMoney(game.cash));
     el.cash.classList.toggle('negative', game.cash < 0);
+    const { clock } = game;
     setText(
       el.day,
-      `${t('hud.day', { day: game.clock.day })} · ${t('hud.month', { month: game.clock.month })}`,
+      `${t(`cal.weekday.${clock.weekday}`)} ${formatClock(clock.minuteOfDay)} · ${t('cal.week', { week: clock.weekOfMonth })}`,
     );
-    setText(el.clock, formatClock(game.clock.minuteOfDay));
+    setText(
+      el.clock,
+      `${t(`cal.month.${clock.monthOfYear}`)}, ${t('cal.year', { year: clock.year })}`,
+    );
     const { player, rival } = game.marketShare;
     el.marketPlayer.style.width = `${player}%`;
     el.marketPlayer.nextElementSibling.style.width = `${rival}%`;

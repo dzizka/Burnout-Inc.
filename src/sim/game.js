@@ -20,8 +20,11 @@ export class Game {
 
   /** @param {number} dt herné sekundy */
   update(dt) {
-    const { dayEnded, monthEnded } = this.clock.tick(dt);
-    if (dayEnded) this.events.emit('day:end', { day: this.clock.day - 1 });
-    if (monthEnded) this.events.emit('month:end', { month: this.clock.month - 1 });
+    const ended = this.clock.tick(dt);
+    if (ended.dayEnded) this.events.emit('day:end', { day: this.clock.day - 1 });
+    if (ended.weekEnded) this.events.emit('week:end', {});
+    // Mesačná uzávierka: mzdy, nájom, úroky (D5) – implementácia v M4.
+    if (ended.monthEnded) this.events.emit('month:end', { month: this.clock.monthIndex - 1 });
+    if (ended.yearEnded) this.events.emit('year:end', { year: this.clock.year - 1 });
   }
 }

@@ -8,7 +8,7 @@ pokračujú poschodia, rival, Black Ops a meta-progres.
 
 - Vite + vanilla JS, ESLint, Prettier, Vitest, CI, deploy na GitHub Pages
 - Herná slučka s pevným krokom, rýchlosti pauza/1x/2x/3x
-- Kalendár (deň = 45 s, mesiac = 5 dní)
+- Kalendár: deň 9 s, týždeň 45 s, mesiac 3 min, rok 36 min pri 1x (D6)
 - Canvas s celočíselným škálovaním, placeholder suterén 12×10
 - HUD (hotovosť, deň, trh, škandál), i18n SK/EN
 
@@ -37,7 +37,7 @@ pokračujú poschodia, rival, Black Ops a meta-progres.
 
 ## M4 – Ekonomika & uloženie (GDD fáza 4)
 
-- Denná/mesačná uzávierka, mzdy, nájom, bankrot
+- Mesačná uzávierka: mzdy (D5), nájom, splátky úverov (D13), bankrot s lehotou (D12)
 - Škandál meter a jeho dôsledky
 - Save/Load do localStorage (verziovaný formát)
 

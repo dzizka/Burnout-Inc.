@@ -1,7 +1,7 @@
 import sk from './sk.js';
 import en from './en.js';
 
-// Lokalizácia: t('hud.day', { day: 3 }) → "Deň 3". Chýbajúci preklad padá späť
+// Lokalizácia: t('cal.week', { week: 2 }) → "2. týždeň". Chýbajúci preklad padá späť
 // na slovenčinu a potom na samotný kľúč, aby hra nikdy nespadla na texte.
 
 export const LOCALES = { sk, en };
