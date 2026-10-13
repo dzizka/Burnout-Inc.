@@ -216,3 +216,108 @@ button.active {
     display: none;
   }
 }
+
+/* Panel stavania (GDD 8.1C) */
+#build-panel {
+  pointer-events: auto;
+  align-self: center;
+  margin-top: auto;
+  margin-bottom: 6px;
+  max-width: min(720px, calc(100% - 16px));
+  padding: 6px 8px;
+  background: var(--panel);
+  border: 2px solid var(--panel-border);
+  border-radius: 4px;
+}
+
+#build-panel[hidden] {
+  display: none;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.panel-header span {
+  margin-right: auto;
+}
+
+#build-items {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.build-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.build-item .price {
+  color: var(--player);
+  font-size: 12px;
+}
+
+#build-panel .hint {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* Vývojárske menu (GDD 10.3) */
+#dev-menu {
+  pointer-events: auto;
+  position: absolute;
+  top: 60px;
+  left: 8px;
+  z-index: 10;
+  max-width: 320px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #00ff66;
+  box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+  color: #00ff66;
+  font-family: monospace;
+}
+
+#dev-menu[hidden] {
+  display: none;
+}
+
+.dev-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.dev-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+#dev-menu button {
+  color: #00ff66;
+  background: #0b1a10;
+  border-color: #1f5e34;
+  font-size: 12px;
+}
+
+@media (max-height: 420px) {
+  #build-panel .hint {
+    display: none;
+  }
+}
