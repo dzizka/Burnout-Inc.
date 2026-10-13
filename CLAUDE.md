@@ -29,7 +29,7 @@ Pravidlá:
 - **Pevný simulačný krok** (`TIME.TICKS_PER_SECOND`). Rýchlosť 2x/3x = viac krokov, nie dlhší krok.
 - **Žiadne magické čísla v logike** – balans patrí do `src/data/`, s odkazom na kapitolu GDD.
 - **Žiadne texty natvrdo.** Všetko, čo vidí hráč, ide cez `t('kľúč')`; kľúč pridaj do `sk.js`
-  aj `en.js` (test kontroluje zhodu). V HTML použi `data-i18n` / `data-i18n-title`.
+  aj `en.js` (test kontroluje zhodu). V HTML použi `data-i18n` / `data-i18n-title`. Výnimka: vývojárske menu (`ui/devMenu.js`).
 - **UI je DOM nad canvasom** (GDD 8.4); canvas kreslí len herný svet. Interaktívne prvky min. 44×44 px.
 - Virtuálne rozlíšenie ~480×270, dlaždica 16 px, celočíselné škálovanie, `image-rendering: pixelated`.
 

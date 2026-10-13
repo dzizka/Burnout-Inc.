@@ -12,12 +12,12 @@ pokračujú poschodia, rival, Black Ops a meta-progres.
 - Canvas s celočíselným škálovaním, placeholder suterén 12×10
 - HUD (hotovosť, deň, trh, škandál), i18n SK/EN
 
-## M1 – Mriežka & stavanie (GDD fáza 1)
+## M1 – Mriežka & stavanie (GDD fáza 1) ✅
 
 - Kamera: posun (ťahanie / WASD), zoom (koliesko / pinch)
 - Výber dlaždice myšou aj dotykom (Pointer Events)
-- Objekty s rozmermi, kolíziou a `interactionTile`: stôl s PC, kávovar, toaleta
-- Režim stavania: náhľad, umiestnenie, cena, predaj
+- Objekty s rozmermi, kolíziou a `interactionTile`: stôl s PC, kávovar, automat, toaleta, fajčiarsky kútik
+- Režim stavania: náhľad, umiestnenie, cena, predaj (rotácia a viacdlaždicové objekty neskôr)
 - Y-sorting objektov (GDD 2.5)
 - Dev Cheat Menu (GDD 10.3) – základ na ladenie
 
