@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="sk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#16171b" />
+    <title>Burnout Inc.</title>
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <div id="game-container">
+      <canvas id="gameCanvas"></canvas>
+
+      <div id="ui-layer">
+        <header id="status-bar">
+          <div class="stat" id="cash-stat" data-i18n-title="hud.cash">
+            <span id="cash-display">€ 0</span>
+          </div>
+          <div class="stat" id="calendar">
+            <span id="day-display"></span>
+            <span id="clock-display"></span>
+          </div>
+          <div class="stat meter-stat" data-i18n-title="hud.market">
+            <span class="label" data-i18n="hud.market"></span>
+            <div class="market-bar">
+              <div id="market-player"></div>
+              <div id="market-rival"></div>
+            </div>
+            <span id="market-value"></span>
+          </div>
+          <div class="stat meter-stat" data-i18n-title="hud.scandal">
+            <span class="label" data-i18n="hud.scandal"></span>
+            <div class="scandal-bar"><div id="scandal-fill"></div></div>
+            <span id="scandal-value"></span>
+          </div>
+          <div id="time-controls">
+            <button data-speed="0" data-i18n-title="time.pause">❚❚</button>
+            <button data-speed="1">▶</button>
+            <button data-speed="2">▶▶</button>
+            <button data-speed="3">▶▶▶</button>
+          </div>
+          <button id="btn-lang" data-i18n-title="menu.language">SK</button>
+        </header>
+
+        <div id="toast" role="status" aria-live="polite"></div>
+
+        <footer id="bottom-dock">
+          <button id="tab-build" data-i18n="dock.build"></button>
+          <button id="tab-staff" data-i18n="dock.staff"></button>
+          <button id="tab-rd" data-i18n="dock.projects"></button>
+          <button id="tab-sabotage" data-i18n="dock.blackops"></button>
+        </footer>
+      </div>
+    </div>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

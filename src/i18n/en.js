@@ -1,0 +1,20 @@
+// English translation. Keys must match sk.js (checked by tests).
+export default {
+  'game.title': 'Burnout Inc.',
+  'game.subtitle': 'Disrupt or Die',
+  'hud.cash': 'Cash',
+  'hud.day': 'Day {day}',
+  'hud.month': 'Month {month}',
+  'hud.market': 'Market',
+  'hud.scandal': 'Scandal',
+  'time.pause': 'Pause',
+  'time.speed': 'Speed {speed}x',
+  'menu.language': 'Language',
+  'dock.build': 'Build',
+  'dock.staff': 'Staff',
+  'dock.projects': 'Projects',
+  'dock.blackops': 'Black Ops',
+  'toast.dayEnd': 'End of day {day}',
+  'toast.monthEnd': 'Monthly closing – month {month}',
+  'toast.comingSoon': 'Not implemented yet.',
+};

@@ -1,0 +1,20 @@
+// Slovenčina – primárny jazyk hry. Kľúče musia zodpovedať en.js (kontroluje test).
+export default {
+  'game.title': 'Burnout Inc.',
+  'game.subtitle': 'Disrupt or Die',
+  'hud.cash': 'Hotovosť',
+  'hud.day': 'Deň {day}',
+  'hud.month': 'Mesiac {month}',
+  'hud.market': 'Trh',
+  'hud.scandal': 'Škandál',
+  'time.pause': 'Pauza',
+  'time.speed': 'Rýchlosť {speed}x',
+  'menu.language': 'Jazyk',
+  'dock.build': 'Stavať',
+  'dock.staff': 'Personál',
+  'dock.projects': 'Projekty',
+  'dock.blackops': 'Black Ops',
+  'toast.dayEnd': 'Koniec dňa {day}',
+  'toast.monthEnd': 'Mesačná uzávierka – mesiac {month}',
+  'toast.comingSoon': 'Zatiaľ nie je hotové.',
+};

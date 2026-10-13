@@ -1,0 +1,218 @@
+:root {
+  --bg: #16171b;
+  --panel: rgba(22, 23, 27, 0.88);
+  --panel-border: #3a3d45;
+  --text: #e8e6e1;
+  --muted: #9a9ca3;
+  --accent: #f2b33d;
+  --player: #4fb36b;
+  --rival: #c6443c;
+  --danger: #e0533f;
+  --touch: 44px; /* GDD 2.2 – minimálna dotyková plocha */
+  font-family: 'Courier New', ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#game-container {
+  position: fixed;
+  inset: 0;
+}
+
+#gameCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#ui-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+#ui-layer button,
+#status-bar {
+  pointer-events: auto;
+}
+
+button {
+  font: inherit;
+  color: var(--text);
+  background: #2a2c33;
+  border: 2px solid var(--panel-border);
+  border-radius: 4px;
+  min-width: var(--touch);
+  min-height: var(--touch);
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--muted);
+}
+
+button.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+#status-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 4px 8px;
+  background: var(--panel);
+  border-bottom: 2px solid var(--panel-border);
+  font-size: 14px;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.label {
+  color: var(--muted);
+}
+
+#cash-display {
+  color: var(--player);
+  font-weight: bold;
+  font-size: 16px;
+}
+
+#cash-display.negative {
+  color: var(--danger);
+  animation: blink 1s steps(2) infinite;
+}
+
+#calendar {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  line-height: 1.1;
+}
+
+#clock-display {
+  color: var(--muted);
+}
+
+.market-bar,
+.scandal-bar {
+  display: flex;
+  width: 72px;
+  height: 10px;
+  background: #33353c;
+  border: 1px solid var(--panel-border);
+}
+
+#market-player {
+  background: var(--player);
+}
+
+#market-rival {
+  margin-left: auto;
+  background: var(--rival);
+}
+
+#scandal-fill {
+  background: var(--accent);
+}
+
+.scandal-bar.danger {
+  animation: pulse 0.8s ease-in-out infinite alternate;
+}
+
+.scandal-bar.danger #scandal-fill {
+  background: var(--danger);
+}
+
+#time-controls {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+#time-controls button {
+  font-size: 11px;
+  letter-spacing: -2px;
+}
+
+#btn-lang {
+  font-weight: bold;
+}
+
+#bottom-dock {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px;
+  background: var(--panel);
+  border-top: 2px solid var(--panel-border);
+}
+
+#bottom-dock button {
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0 14px;
+}
+
+#toast {
+  align-self: center;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: var(--panel);
+  border: 2px solid var(--accent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+#toast.visible {
+  opacity: 1;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes pulse {
+  to {
+    box-shadow: 0 0 8px var(--danger);
+  }
+}
+
+@media (max-height: 420px) {
+  #status-bar {
+    font-size: 12px;
+    gap: 8px;
+  }
+  .label {
+    display: none;
+  }
+}
