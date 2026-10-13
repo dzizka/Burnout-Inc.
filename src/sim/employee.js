@@ -8,6 +8,7 @@ import {
   USE,
 } from '../data/needs.js';
 import { findPath } from './pathfinding.js';
+import { OBJECTS } from '../data/objects.js';
 
 // Zamestnanec: 6 potrieb (100 → 0) a stavový automat (GDD 4.1–4.3).
 // Pozícia je v dlaždiciach; celé čísla = stred dlaždice.
@@ -269,7 +270,8 @@ export class Employee {
       );
     }
     this.workDone += rate * dt;
-    game.addWork(this, rate * dt);
+    if (OBJECTS[this.desk(game).type].seat === 'support') game.handleTickets(this, rate * dt, dt);
+    else game.addWork(this, rate * dt);
     if (this.activity === Activity.WORKING) this.decide(game);
   }
 

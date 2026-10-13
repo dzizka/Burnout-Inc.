@@ -1,6 +1,9 @@
-// Headless balans simulácia: `npm run sim -- [mesiace] [seed] [scenár]`
-// Postaví kanceláriu, najme zamestnancov a vypíše, ako trávia čas a koľko kolabujú.
-// Scenáre: full (všetko vybavenie), minimal (len stoly a kávovar).
+// Headless balans simulácia: `npm run sim -- [mesiace] [seed] [scenár] [stratégia]`
+// Postaví kanceláriu, najme zamestnancov a vypíše, ako trávia čas, koľko kolabujú
+// a ako sa darí produktom.
+// Scenáre: full (všetko vybavenie), minimal (len stoly a kávovar),
+//          studio (3 vývojári + 1 operátor podpory).
+// Stratégia produktov: polish (ladiť do <5 bugov), ship (vydať hneď), none.
 
 import { Game } from '../src/sim/game.js';
 import { Activity } from '../src/sim/employee.js';
@@ -9,6 +12,7 @@ import { TIME } from '../src/data/balance.js';
 const months = Number(process.argv[2] ?? 3);
 const seed = Number(process.argv[3] ?? 1);
 const scenario = process.argv[4] ?? 'full';
+const strategy = process.argv[5] ?? 'polish';
 
 const SCENARIOS = {
   full: [
@@ -20,6 +24,16 @@ const SCENARIOS = {
     ['vending', 10, 5],
     ['toilet', 10, 7],
     ['smoking', 1, 7],
+  ],
+  studio: [
+    ['desk', 2, 2],
+    ['desk', 4, 2],
+    ['desk', 6, 2],
+    ['support', 2, 6],
+    ['coffee', 10, 2],
+    ['vending', 10, 5],
+    ['toilet', 10, 7],
+    ['smoking', 7, 7],
   ],
   minimal: [
     ['desk', 2, 2],
@@ -57,8 +71,26 @@ let samples = 0;
 let breaksStarted = 0;
 const lastActivity = new Map();
 
+const launches = [];
+let maxTickets = 0;
+game.events.on('product:launched', ({ score }) => launches.push(score));
+
+function manageProducts() {
+  if (strategy === 'none') return;
+  const studio = game.studio;
+  if (!studio.project) studio.startProject('mobileApp', 'oneTime', game);
+  else if (studio.project.phase === 'ready') {
+    if (strategy === 'ship') studio.launch(game);
+    else studio.polish();
+  } else if (studio.project.phase === 'polishing' && studio.project.bugs < 5) {
+    studio.launch(game);
+  }
+}
+
 for (let i = 0; i < seconds / dt; i++) {
+  manageProducts();
   game.update(dt);
+  maxTickets = Math.max(maxTickets, game.studio.pendingTickets);
   for (const e of game.employees) {
     const key = e.isWalking ? `${e.activity} (chôdza)` : e.activity;
     activityTime[key] = (activityTime[key] ?? 0) + dt;
@@ -88,4 +120,14 @@ for (const [k, v] of Object.entries(counts)) {
 console.log(
   `\nPrestávky: ${(breaksStarted / 4 / minutes).toFixed(2)} na osobu za minútu, ` +
     `práca: ${(game.workDone / minutes).toFixed(0)} bodov/min`,
+);
+
+const totalRevenue = game.studio.products.reduce((s, p) => s + p.totalRevenue, 0);
+console.log(
+  `\nProdukty (${strategy}): vydané ${launches.length}, skóre ${launches.map((s) => s.toFixed(1)).join(', ') || '–'}`,
+);
+console.log(
+  `  hotovosť ${Math.round(game.cash)} € (bez miezd), tržby živých produktov ${totalRevenue} €, ` +
+    `škandál ${game.scandal.toFixed(1)} %, max. tiketov ${Math.round(maxTickets)}, ` +
+    `trh hráč ${game.marketShare.player.toFixed(1)} %`,
 );
