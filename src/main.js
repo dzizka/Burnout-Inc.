@@ -6,6 +6,7 @@ import { loadAssets } from './render/assets.js';
 import { Hud } from './ui/hud.js';
 import { BuildMenu } from './ui/buildMenu.js';
 import { StaffPanel } from './ui/staffPanel.js';
+import { ProjectsPanel } from './ui/projectsPanel.js';
 import { Inspector } from './ui/inspector.js';
 import { DevMenu } from './ui/devMenu.js';
 import { InputController } from './ui/input.js';
@@ -35,6 +36,7 @@ const loop = new FixedStepLoop({
     renderer.render(game, now / 1000);
     hud.refresh();
     inspector.refresh();
+    projectsPanel.refresh();
   },
 });
 
@@ -50,10 +52,21 @@ const staffPanel = new StaffPanel(game, hud, {
   },
   onOpen: () => {
     buildMenu.close();
+    projectsPanel.close();
     inspector.select(null);
   },
 });
-buildMenu.onOpen = () => staffPanel.close();
+const projectsPanel = new ProjectsPanel(game, hud, {
+  onOpen: () => {
+    buildMenu.close();
+    staffPanel.close();
+    inspector.select(null);
+  },
+});
+buildMenu.onOpen = () => {
+  staffPanel.close();
+  projectsPanel.close();
+};
 bindEventToasts(game, hud);
 
 const input = new InputController(renderer, {
@@ -70,6 +83,7 @@ const input = new InputController(renderer, {
   onCancel: () => {
     if (buildMenu.mode || buildMenu.isOpen) buildMenu.cancel();
     else if (staffPanel.isOpen) staffPanel.close();
+    else if (projectsPanel.isOpen) projectsPanel.close();
     else inspector.select(null);
   },
 });

@@ -16,7 +16,7 @@ export const PRODUCT_TYPES = {
     id: 'dataBroker',
     target: 400,
     bugRate: 0.35,
-    revenue: 600,
+    revenue: 380,
     lifetime: 80,
     market: 6,
   },

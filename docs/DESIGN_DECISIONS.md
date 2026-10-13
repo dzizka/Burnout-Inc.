@@ -113,8 +113,19 @@ Morálky a ikona nad hlavou, ktorá ukazuje, čo chýba.
 
 ## D11 – Vzorec skóre a tikety · rozhodnuté
 
-Skóre produktu sa oreže na 0–10. Vplyv tiketov sa obmedzí, napr. `min(3, tikety / 50)`.
-Presné čísla sa doladia v M3.
+Implementované (`src/sim/studio.js`, `src/data/products.js`):
+
+`skóre = clamp(0, 10, 10 × min(1, body / cieľ) − (bugy / cieľ) × 20 − min(3, tikety / 50))`
+
+- Hustota bugov namiesto počtu – veľký projekt nie je trestaný za veľkosť.
+- Tikety: každý neopravený bug živého produktu generuje 0,03 tiketu/s (agresívna
+  monetizácia ×1,5). Operátor vybaví 1,2 × zručnosť tiketov/s. Nevybavené tikety
+  pridávajú 0,0002 % škandálu/s za tiket (max. 100 tiketov).
+- Vydanie so skóre < 4 nezíska trh a pridá škandál 2 % za každý chýbajúci bod.
+
+Simulácia (`npm run sim -- 3 1 studio polish|ship`, 3 vývojári + operátor, 3 mesiace):
+ladenie → 5 produktov so skóre 9,3, škandál 0,4 %, trh 19 %; vydávanie hneď →
+8 produktov so skóre 2–4, škandál 24 %, až 2 500 nevybavených tiketov, trh 5 %.
 
 ## D12 – Bankrot a debet · rozhodnuté (ladí sa)
 

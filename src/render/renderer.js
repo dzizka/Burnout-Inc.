@@ -53,6 +53,9 @@ export class Renderer {
      *          debug: boolean }}
      */
     this.overlay = { hover: null, ghost: null, highlight: null, selected: null, debug: false };
+    /** Stúpajúce modré/červené body nad stolmi (GDD 3.3B) – len vizuál. */
+    this.particles = [];
+    this.lastTime = null;
     this.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio || 1);
   }
 
@@ -159,6 +162,8 @@ export class Renderer {
       drawSelection(this.ctx, this.overlay.selected);
     }
     this.drawEntities(floor, employees, time);
+    this.drawRinging(game, floorIndex, time);
+    this.updateParticles(game, employees, time);
     this.drawOverlayOver();
     // Vrstva 4 (GDD 2.5): emotikony nad všetkým.
     for (const e of employees) drawEmote(this.ctx, e, time, this.assets);
@@ -201,6 +206,59 @@ export class Renderer {
     ];
     items.sort((a, b) => a.sortY - b.sortY || a.sortX - b.sortX);
     for (const item of items) item.draw();
+  }
+
+  /** Zvoniace stoly podpory: kmitajúce vlnky nad telefónom (GDD 6.2A). */
+  drawRinging(game, floorIndex, time) {
+    if (Math.floor(time * 6) % 2) return;
+    const { ctx } = this;
+    ctx.fillStyle = '#f2c53d';
+    for (const desk of game.ringingDesks(floorIndex)) {
+      const x = desk.x * S + 8;
+      const y = desk.y * S - 6;
+      ctx.fillRect(x - 6, y, 1, 3);
+      ctx.fillRect(x - 8, y - 1, 1, 5);
+      ctx.fillRect(x + 6, y, 1, 3);
+      ctx.fillRect(x + 8, y - 1, 1, 5);
+    }
+  }
+
+  /**
+   * Častice práce: modré = funkcie, červené = bugy, zelené = opravy (ladenie/hotfix).
+   * Čisto vizuálne, preto smie používať Math.random().
+   */
+  updateParticles(game, employees, time) {
+    const dt = this.lastTime === null ? 0 : Math.min(0.1, time - this.lastTime);
+    this.lastTime = time;
+    const project = game.studio.project;
+    const fixing = !project || project.phase !== 'development';
+    for (const e of employees) {
+      if (e.isWalking || !['WORKING', 'HYPERACTIVE'].includes(e.activity)) continue;
+      const desk = e.desk(game);
+      if (!desk || OBJECTS[desk.type].seat !== 'dev') continue;
+      if (fixing && !game.studio.products.length && !project) continue;
+      const rate = e.activity === 'HYPERACTIVE' ? 6 : 2; // častíc za sekundu
+      if (Math.random() > rate * dt) continue;
+      let color = '#4f8fd8';
+      if (fixing) color = '#4fb36b';
+      else if (Math.random() < 0.3) color = '#e0533f';
+      this.particles.push({
+        x: desk.x * S + 4 + Math.random() * 8,
+        y: desk.y * S - 6,
+        life: 1,
+        color,
+      });
+    }
+    const { ctx } = this;
+    for (const p of this.particles) {
+      p.life -= dt;
+      p.y -= 12 * dt;
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(Math.round(p.x), Math.round(p.y), 2, 2);
+    }
+    ctx.globalAlpha = 1;
+    this.particles = this.particles.filter((p) => p.life > 0);
   }
 
   drawOverlayUnder(floor) {
