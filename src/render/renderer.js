@@ -4,6 +4,8 @@ import { Tile } from '../sim/grid.js';
 import { FRAMES, createPlaceholderTileset } from './tileset.js';
 import { createObjectSprites, OVERHANG } from './sprites.js';
 import { Camera } from './camera.js';
+import { drawEmployee, drawSelection, feetY } from './characters.js';
+import { drawEmote } from './emotes.js';
 
 const S = RENDER.TILE_SIZE;
 
@@ -47,9 +49,10 @@ export class Renderer {
      * @type {{ hover: {x: number, y: number} | null,
      *          ghost: {type: string, x: number, y: number, valid: boolean} | null,
      *          highlight: import('../sim/floor.js').PlacedObject | null,
+     *          selected: import('../sim/employee.js').Employee | null,
      *          debug: boolean }}
      */
-    this.overlay = { hover: null, ghost: null, highlight: null, debug: false };
+    this.overlay = { hover: null, ghost: null, highlight: null, selected: null, debug: false };
     this.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio || 1);
   }
 
@@ -78,11 +81,39 @@ export class Renderer {
     };
   }
 
+  /** CSS pixely → svetové pixely. */
+  clientToWorld(clientX, clientY) {
+    const v = this.clientToView(clientX, clientY);
+    return this.camera.viewToWorld(v.x, v.y);
+  }
+
   /** CSS pixely → súradnice dlaždice. */
   clientToTile(clientX, clientY) {
-    const v = this.clientToView(clientX, clientY);
-    const w = this.camera.viewToWorld(v.x, v.y);
+    const w = this.clientToWorld(clientX, clientY);
     return { x: Math.floor(w.x / S), y: Math.floor(w.y / S) };
+  }
+
+  /**
+   * Postava pod svetovým bodom. Najprv presný zásah do tela; ak nie je, najbližšia
+   * postava do `tolerance` px (prst je na dotykovom displeji nepresný, GDD 2.2).
+   */
+  employeeAt(game, world, floorIndex = 0, tolerance = 10) {
+    let best = null;
+    let bestDist = Infinity;
+    for (const e of game.employees) {
+      if (e.floorIndex !== floorIndex) continue;
+      const cx = e.x * S + S / 2;
+      const feet = feetY(e);
+      const dx = Math.max(0, Math.abs(world.x - cx) - 6);
+      const dy = Math.max(0, feet - 18 - world.y, world.y - (feet + 2));
+      // Pri presnom zásahu má prednosť predná postava (väčšie Y).
+      const dist = Math.hypot(dx, dy) - feet / 1000;
+      if (dist < bestDist) {
+        best = e;
+        bestDist = dist;
+      }
+    }
+    return bestDist <= tolerance ? best : null;
   }
 
   /** @param {import('../sim/floor.js').Floor} floor */
@@ -90,8 +121,11 @@ export class Renderer {
     this.camera.centerOn(floor.width * S, floor.height * S);
   }
 
-  /** @param {import('../sim/game.js').Game} game */
-  render(game, floorIndex = 0) {
+  /**
+   * @param {import('../sim/game.js').Game} game
+   * @param {number} time sekundy od štartu (animácie)
+   */
+  render(game, time = 0, floorIndex = 0) {
     const { ctx, canvas, camera } = this;
     const floor = game.floors[floorIndex];
     camera.clamp(floor.width * S, floor.height * S);
@@ -108,11 +142,17 @@ export class Renderer {
       -Math.round(camera.y * camera.zoom),
     );
 
+    const employees = game.employees.filter((e) => e.floorIndex === floorIndex);
     this.drawTiles(floor);
     this.drawOverlayUnder(floor);
-    this.drawObjects(floor);
+    if (this.overlay.selected?.floorIndex === floorIndex) {
+      drawSelection(this.ctx, this.overlay.selected);
+    }
+    this.drawEntities(floor, employees, time);
     this.drawOverlayOver();
-    if (this.overlay.debug) this.drawDebug(floor);
+    // Vrstva 4 (GDD 2.5): emotikony nad všetkým.
+    for (const e of employees) drawEmote(this.ctx, e, time);
+    if (this.overlay.debug) this.drawDebug(floor, employees);
   }
 
   drawTiles(floor) {
@@ -126,17 +166,30 @@ export class Renderer {
     }
   }
 
-  /** Vrstva 2 (GDD 2.5): objekty zoradené podľa Y. */
-  drawObjects(floor) {
+  /** Vrstva 2 (GDD 2.5): objekty a postavy zoradené podľa Y (spodnej hrany). */
+  drawEntities(floor, employees, time) {
     const { ctx, overlay } = this;
-    for (const obj of floor.sortedObjects()) {
-      ctx.drawImage(this.sprites[obj.type], obj.x * S, obj.y * S - OVERHANG);
-      if (overlay.highlight === obj) {
-        const def = OBJECTS[obj.type];
-        ctx.fillStyle = 'rgba(224, 83, 63, 0.45)';
-        ctx.fillRect(obj.x * S, obj.y * S - OVERHANG, def.width * S, def.height * S + OVERHANG);
-      }
-    }
+    const items = [
+      ...floor.objects.map((obj) => ({
+        sortY: (obj.y + OBJECTS[obj.type].height) * S,
+        sortX: obj.x,
+        draw: () => {
+          ctx.drawImage(this.sprites[obj.type], obj.x * S, obj.y * S - OVERHANG);
+          if (overlay.highlight === obj) {
+            const def = OBJECTS[obj.type];
+            ctx.fillStyle = 'rgba(224, 83, 63, 0.45)';
+            ctx.fillRect(obj.x * S, obj.y * S - OVERHANG, def.width * S, def.height * S + OVERHANG);
+          }
+        },
+      })),
+      ...employees.map((e) => ({
+        sortY: feetY(e),
+        sortX: e.x,
+        draw: () => drawEmployee(ctx, e, time),
+      })),
+    ];
+    items.sort((a, b) => a.sortY - b.sortY || a.sortX - b.sortX);
+    for (const item of items) item.draw();
   }
 
   drawOverlayUnder(floor) {
@@ -173,7 +226,7 @@ export class Renderer {
     ctx.globalAlpha = 1;
   }
 
-  drawDebug(floor) {
+  drawDebug(floor, employees) {
     const { ctx } = this;
     ctx.lineWidth = 1 / this.camera.zoom;
     for (let y = 0; y < floor.height; y++) {
@@ -190,6 +243,11 @@ export class Renderer {
       const t = floor.interactionTile(obj);
       ctx.fillStyle = 'rgba(242, 179, 61, 0.8)';
       ctx.fillRect(t.x * S + 6, t.y * S + 6, 4, 4);
+    }
+    // Plánované cesty postáv (A*).
+    ctx.fillStyle = 'rgba(79, 143, 216, 0.8)';
+    for (const e of employees) {
+      for (const t of e.path) ctx.fillRect(t.x * S + 7, t.y * S + 7, 2, 2);
     }
   }
 }

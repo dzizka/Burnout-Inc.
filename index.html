@@ -47,7 +47,7 @@
 
         <div id="toast" role="status" aria-live="polite"></div>
 
-        <section id="build-panel" hidden>
+        <section id="build-panel" class="dock-panel" hidden>
           <div class="panel-header">
             <span data-i18n="build.title"></span>
             <button id="btn-sell" data-i18n="build.sell"></button>
@@ -56,6 +56,38 @@
           <div id="build-items"></div>
           <p class="hint" data-i18n="build.hint"></p>
         </section>
+
+        <section id="staff-panel" class="dock-panel" hidden>
+          <div class="panel-header">
+            <span class="title"></span>
+            <button id="btn-staff-close" data-i18n-title="build.close">×</button>
+          </div>
+          <div class="staff-cols">
+            <div>
+              <h3 data-i18n="staff.employees"></h3>
+              <div id="staff-list"></div>
+            </div>
+            <div>
+              <h3 data-i18n="staff.candidates"></h3>
+              <div id="candidate-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <aside id="inspector" hidden>
+          <div class="panel-header">
+            <span class="name"></span>
+            <button id="btn-inspect-close" data-i18n-title="inspect.close">×</button>
+          </div>
+          <p class="activity"></p>
+          <p class="wage"></p>
+          <div class="needs"></div>
+          <div class="actions">
+            <button id="btn-bonus"></button>
+            <button id="btn-break" data-i18n="inspect.break"></button>
+            <button id="btn-fire" data-i18n="inspect.fire"></button>
+          </div>
+        </aside>
 
         <footer id="bottom-dock">
           <button id="tab-build" data-i18n="dock.build"></button>

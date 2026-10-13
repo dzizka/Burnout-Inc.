@@ -21,13 +21,13 @@ pokračujú poschodia, rival, Black Ops a meta-progres.
 - Y-sorting objektov (GDD 2.5)
 - Dev Cheat Menu (GDD 10.3) – základ na ladenie
 
-## M2 – Zamestnanci & AI (GDD fáza 2)
+## M2 – Zamestnanci & AI (GDD fáza 2) ✅
 
 - A* pathfinding na mriežke
 - Trieda zamestnanca so 6 potrebami (dáta v `src/data/`)
 - FSM: WORKING → COFFEE_BREAK / TOILET / … → návrat k stolu
 - DRAMA_QUEEN s AoE efektom, ikony nad hlavou
-- Karta zamestnanca (inšpekcia)
+- Karta zamestnanca (inšpekcia), nábor s mesačným platom, balansová simulácia `npm run sim`
 
 ## M3 – Produkt & Support (GDD fáza 3)
 

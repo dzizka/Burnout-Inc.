@@ -80,11 +80,18 @@ nie na kopírovaní konkrétnych čísel.
 
 ## D7 – Rýchlosti úbytku potrieb · rozhodnuté (ladí sa)
 
-Hodnoty z GDD 4.1 sú v reálnych sekundách pri 1x (D6). Pri -0.2/s by Energia klesla
-na 25 % až za ~6 minút, čo je pri novom kalendári ~2 mesiace. Hodnoty sa preto v M2
-prepočítajú na cieľ z D6 (prestávka každých ~10–20 s) a doladia sa headless simuláciou.
-Hygiena: platí tabuľka (-0.15 ako východisko). Úbytok Morálky (-0.05/s pri dlho nízkych
-potrebách) sa implementuje.
+Hodnoty sú v reálnych sekundách pri 1x (D6) a ladia sa simuláciou `npm run sim`.
+Cieľ: jedna prestávka na osobu zhruba každých 30 s, ~75 % času pri stole.
+
+Prvá verzia (prestávka každých ~10 s) viedla v simulácii k 60 % času v štrajku, preto
+platia nižšie hodnoty (`src/data/needs.js`): Energia 0.8/s, Zasýtenie 0.5/s, Hygiena
+0.45/s, Zábava 0.4/s, Pokoj 0.35/s, každý zamestnanec s odchýlkou ±15 %.
+Morálka klesá 0.2/s za každú potrebu v kritickej zóne a pomaly sa zotavuje, keď sú
+všetky potreby nad polovicou.
+
+Výsledok simulácie (4 zamestnanci, plne vybavený suterén, 3 mesiace): ~76 % práca
+(vrátane cesty k stolu), priemerná Morálka 83, občasný prank a záchvat. Bez WC
+a automatu zamestnanci väčšinu času štrajkujú – chýbajúce vybavenie musí bolieť (D10).
 
 ## D8 – Sila DRAMA_QUEEN AoE · rozhodnuté
 

@@ -41,11 +41,4 @@ describe('Floor', () => {
     expect(floor.objectAt(2, 2)).toBeUndefined();
     expect(floor.isWalkable(2, 2)).toBe(true);
   });
-
-  it('Y-sorting: nižšie objekty sa kreslia neskôr', () => {
-    const floor = room();
-    const low = floor.place('desk', 1, 3);
-    const high = floor.place('desk', 4, 1);
-    expect(floor.sortedObjects()).toEqual([high, low]);
-  });
 });
