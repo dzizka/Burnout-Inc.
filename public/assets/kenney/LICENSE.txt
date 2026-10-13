@@ -1,0 +1,11 @@
+Kenney assets used in Burnout Inc.
+
+- indoor.png  – "Roguelike Indoor pack" by Kenney (www.kenney.nl)
+- urban.png   – "RPG Urban Pack 1.0" by Kenney (www.kenney.nl)
+- emotes.png  – "Emotes Pack" (pixel style 1) by Kenney (www.kenney.nl)
+
+License: Creative Commons Zero (CC0)
+http://creativecommons.org/publicdomain/zero/1.0/
+
+You may use these assets in personal and commercial projects.
+Credit (Kenney or www.kenney.nl) is not mandatory but appreciated.

@@ -1,7 +1,8 @@
 import { RENDER } from '../data/balance.js';
 import { OBJECTS } from '../data/objects.js';
 import { Tile } from '../sim/grid.js';
-import { FRAMES, createPlaceholderTileset } from './tileset.js';
+import { FRAMES, createTileset } from './tileset.js';
+import { NO_ASSETS } from './assets.js';
 import { createObjectSprites, OVERHANG } from './sprites.js';
 import { Camera } from './camera.js';
 import { drawEmployee, drawSelection, feetY } from './characters.js';
@@ -41,8 +42,7 @@ export class Renderer {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
-    this.tileset = createPlaceholderTileset(createCanvas);
-    this.sprites = createObjectSprites(createCanvas, OBJECTS);
+    this.setAssets(NO_ASSETS);
     this.camera = new Camera();
     /**
      * Pomocné vrstvy nastavované z UI.
@@ -54,6 +54,16 @@ export class Renderer {
      */
     this.overlay = { hover: null, ghost: null, highlight: null, selected: null, debug: false };
     this.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio || 1);
+  }
+
+  /**
+   * Nastaví spritesheety a prekreslí atlasy. Volá sa po načítaní assetov.
+   * @param {import('./assets.js').Assets} assets
+   */
+  setAssets(assets) {
+    this.assets = assets;
+    this.tileset = createTileset(createCanvas, assets);
+    this.sprites = createObjectSprites(createCanvas, OBJECTS, assets);
   }
 
   resize(cssWidth, cssHeight, dpr = 1) {
@@ -151,7 +161,7 @@ export class Renderer {
     this.drawEntities(floor, employees, time);
     this.drawOverlayOver();
     // Vrstva 4 (GDD 2.5): emotikony nad všetkým.
-    for (const e of employees) drawEmote(this.ctx, e, time);
+    for (const e of employees) drawEmote(this.ctx, e, time, this.assets);
     if (this.overlay.debug) this.drawDebug(floor, employees);
   }
 
@@ -185,7 +195,7 @@ export class Renderer {
       ...employees.map((e) => ({
         sortY: feetY(e),
         sortX: e.x,
-        draw: () => drawEmployee(ctx, e, time),
+        draw: () => drawEmployee(ctx, e, time, this.assets),
       })),
     ];
     items.sort((a, b) => a.sortY - b.sortY || a.sortX - b.sortX);

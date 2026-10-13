@@ -3,6 +3,7 @@ import { OBJECTS, SELL_REFUND_RATIO } from '../data/objects.js';
 import { BEHAVIOR, DECAY, DECAY_VARIATION, PLAYER_ACTIONS, CRITICAL } from '../data/needs.js';
 import {
   CANDIDATE_COUNT,
+  CHARACTER_VARIANTS,
   HAIR_COLORS,
   MAX_STAFF_TIER1,
   NAMES,
@@ -140,6 +141,7 @@ export class Game {
         shirt: rng.pick(SHIRT_COLORS),
         hair: rng.pick(HAIR_COLORS),
         skin: rng.pick(SKIN_COLORS),
+        sprite: rng.int(0, CHARACTER_VARIANTS - 1),
       },
     };
   }

@@ -48,7 +48,7 @@ export class Employee {
    * @param {number} data.wage mesačná mzda (D5)
    * @param {number} data.skill násobok rýchlosti práce
    * @param {Record<string, number>} data.decayFactors individuálne násobky úbytku
-   * @param {{ shirt: string, hair: string, skin: string }} data.look
+   * @param {{ shirt: string, hair: string, skin: string, sprite: number }} data.look
    * @param {{ x: number, y: number }} data.position
    */
   constructor({ id, name, gender, wage, skill, decayFactors, look, position }) {
