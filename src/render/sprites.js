@@ -1,13 +1,55 @@
 import { RENDER } from '../data/balance.js';
 import { NO_ASSETS, SHEETS, drawTile } from './assets.js';
 
-// Sprity objektov (3/4 pohľad). Sprite je vyšší ako dlaždica – horná časť (OVERHANG px)
-// presahuje nad pôdorys, aby mal objekt výšku. Kde Kenney Roguelike Indoor pack niečo má
-// (stôl, kuchynská linka), použije sa; kancelárske veci (PC, kávovar, automat, WC)
-// zatiaľ kreslíme kódom v podobnej palete (docs/ASSETS.md).
+// Sprity objektov (3/4 pohľad). Sprite je zarovnaný na spodnú hranu pôdorysu a
+// vycentrovaný – môže byť vyšší aj o pár pixelov širší ako pôdorys (spriteOrigin).
+// Poradie zdrojov: LimeZu Modern Office (ak je pribalený) → Kenney Roguelike Indoor →
+// kreslené kódom (docs/ASSETS.md).
 
 const S = RENDER.TILE_SIZE;
-export const OVERHANG = 8;
+/** Výška náhradných spritov nad pôdorysom. */
+const OVERHANG = 8;
+
+/**
+ * LimeZu Modern Office: výrezy v pixeloch [x, y, šírka, výška] a ich poloha v sprite.
+ * @type {Record<string, { width: number, height: number, layers: { rect: number[], at: number[] }[] }>}
+ */
+const LIMEZU = {
+  desk: {
+    width: 16,
+    height: 31,
+    layers: [
+      { rect: [80, 288, 16, 21], at: [0, 10] }, // stôl
+      { rect: [224, 208, 16, 16], at: [0, 2] }, // monitor
+    ],
+  },
+  coffee: { width: 12, height: 26, layers: [{ rect: [230, 533, 12, 26], at: [0, 0] }] },
+  vending: { width: 18, height: 24, layers: [{ rect: [72, 384, 18, 24], at: [0, 0] }] },
+};
+
+/**
+ * Posun ľavého horného rohu spritu voči ľavému hornému rohu pôdorysu.
+ * @param {{ width: number, height: number }} def rozmery pôdorysu v dlaždiciach
+ * @param {{ width: number, height: number }} sprite
+ */
+export function spriteOrigin(def, sprite) {
+  return {
+    dx: Math.round((def.width * S - sprite.width) / 2),
+    dy: def.height * S - sprite.height,
+  };
+}
+
+function limezuSprite(createCanvas, image, recipe) {
+  const canvas = createCanvas(recipe.width, recipe.height);
+  const ctx = canvas.getContext('2d');
+  for (const {
+    rect: [x, y, w, h],
+    at: [ax, ay],
+  } of recipe.layers) {
+    ctx.drawImage(image, x, y, w, h, ax, ay, w, h);
+  }
+  return canvas;
+}
 
 /** Dlaždice z Kenney Roguelike Indoor pack. */
 const INDOOR = {
@@ -94,6 +136,10 @@ export function createObjectSprites(createCanvas, defs, assets = NO_ASSETS) {
   /** @type {Record<string, HTMLCanvasElement>} */
   const sprites = {};
   for (const [type, def] of Object.entries(defs)) {
+    if (assets.lzOffice && LIMEZU[type]) {
+      sprites[type] = limezuSprite(createCanvas, assets.lzOffice, LIMEZU[type]);
+      continue;
+    }
     const canvas = createCanvas(def.width * S, def.height * S + OVERHANG);
     const paint = PAINTERS[type];
     if (paint) paint(canvas.getContext('2d'), assets);

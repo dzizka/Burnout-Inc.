@@ -8,6 +8,9 @@ import { NO_ASSETS, SHEETS, drawTile } from './assets.js';
 
 /** Svetlosivá dlaždicová podlaha z RPG Urban Pack. */
 const URBAN_FLOOR = 117;
+/** LimeZu Room Builder Office: sivá dlaždicová podlaha a tehlová stena (px). */
+const LZ_FLOOR = [160, 112];
+const LZ_BRICK = [16, 160];
 
 const S = RENDER.TILE_SIZE;
 
@@ -48,7 +51,15 @@ function drawConcrete(ctx, ox) {
   }
 }
 
-function drawWall(ctx, ox) {
+function drawWall(ctx, ox, assets) {
+  if (assets.lzRoom) {
+    ctx.drawImage(assets.lzRoom, ...LZ_BRICK, S, S, ox, 0, S, S);
+    ctx.fillStyle = PALETTE.wallCap;
+    ctx.fillRect(ox, 0, S, 4);
+    ctx.fillStyle = PALETTE.wallFace;
+    ctx.fillRect(ox, 4, S, 1);
+    return;
+  }
   // 3/4 pohľad: horná hrana (cap) + predná fasáda z tehál.
   ctx.fillStyle = PALETTE.mortar;
   ctx.fillRect(ox, 0, S, S);
@@ -68,7 +79,8 @@ function drawWall(ctx, ox) {
 }
 
 function drawFloor(ctx, ox, assets) {
-  if (assets.urban) drawTile(ctx, assets.urban, SHEETS.urban, URBAN_FLOOR, ox, 0);
+  if (assets.lzRoom) ctx.drawImage(assets.lzRoom, ...LZ_FLOOR, S, S, ox, 0, S, S);
+  else if (assets.urban) drawTile(ctx, assets.urban, SHEETS.urban, URBAN_FLOOR, ox, 0);
   else drawConcrete(ctx, ox);
 }
 
@@ -90,7 +102,7 @@ export function createTileset(createCanvas, assets = NO_ASSETS) {
   const atlas = createCanvas(S * 3, S);
   const ctx = atlas.getContext('2d');
   drawFloor(ctx, FRAMES[Tile.FLOOR] * S, assets);
-  drawWall(ctx, FRAMES[Tile.WALL] * S);
+  drawWall(ctx, FRAMES[Tile.WALL] * S, assets);
   drawDoor(ctx, FRAMES[Tile.DOOR] * S, assets);
   return atlas;
 }
