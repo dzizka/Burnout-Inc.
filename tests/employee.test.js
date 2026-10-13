@@ -153,6 +153,16 @@ describe('Employee', () => {
     expect(emp.activity).toBe(Activity.WORKING);
   });
 
+  it('pri nude ide na gauč, ak existuje (GDD 5.5)', () => {
+    const game = office({ objects: [['couch', 7, 5]] });
+    const emp = hire(game);
+    runUntil(game, () => emp.atDesk(game));
+    emp.stats.fun = 10;
+    run(game, DT * 2);
+    expect(emp.activity).toBe(Activity.LOUNGE);
+    expect(runUntil(game, () => emp.stats.fun === 100, 20)).toBe(true);
+  });
+
   it('nuda vedie k pranku na kolegu', () => {
     const game = office({ desks: 2 });
     const a = hire(game);

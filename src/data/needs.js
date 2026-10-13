@@ -29,7 +29,7 @@ export const MORALE = {
 
 /**
  * Ktoré objekty dopĺňajú potrebu (v poradí preferencie) a čo spravia (GDD 4.2).
- * fun nemá objekt – rieši sa prankom (PRANK_COWORKER).
+ * fun: gauč (GDD 5.5); bez neho sa nuda rieši prankom na kolegu (PRANK_COWORKER).
  */
 export const NEED_SOURCES = {
   energy: ['coffee'],
@@ -37,6 +37,7 @@ export const NEED_SOURCES = {
   hygiene: ['toilet'],
   // D10 – bez fajčiarskeho kútika sa fajčí na WC.
   peace: ['smoking', 'toilet'],
+  fun: ['couch'],
 };
 
 /** Poradie kontroly kritických potrieb (GDD 4.4). */
@@ -48,6 +49,8 @@ export const USE = {
   vending: { activity: 'VENDING_MACHINE', duration: 4, side: { hygiene: -15 } },
   toilet: { activity: 'TOILET', duration: 5, side: {} },
   smoking: { activity: 'SMOKE_BREAK', duration: 6, side: {} },
+  // GDD 5.5 – Lounge gauč: dopĺňa Zábavu a trochu aj Pokoj.
+  couch: { activity: 'LOUNGE', duration: 6, side: { peace: 20 } },
 };
 
 export const BEHAVIOR = {

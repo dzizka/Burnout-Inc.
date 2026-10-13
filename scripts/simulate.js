@@ -2,7 +2,8 @@
 // Postaví kanceláriu, najme zamestnancov a vypíše, ako trávia čas, koľko kolabujú
 // a ako sa darí produktom.
 // Scenáre: full (všetko vybavenie), minimal (len stoly a kávovar),
-//          studio (3 vývojári + 1 operátor podpory).
+//          studio (3 vývojári + 1 operátor podpory),
+//          garage (začiatok hry: spoluzakladateľ + základné vybavenie, bez náboru).
 // Stratégia produktov: polish (ladiť do <5 bugov), ship (vydať hneď), none.
 
 import { Game } from '../src/sim/game.js';
@@ -30,6 +31,14 @@ const SCENARIOS = {
     ['desk', 4, 2],
     ['desk', 6, 2],
     ['support', 2, 6],
+    ['couch', 4, 5],
+    ['coffee', 10, 2],
+    ['vending', 10, 5],
+    ['toilet', 10, 7],
+    ['smoking', 7, 7],
+  ],
+  garage: [
+    ['couch', 5, 5],
     ['coffee', 10, 2],
     ['vending', 10, 5],
     ['toilet', 10, 7],
@@ -46,10 +55,17 @@ const SCENARIOS = {
 
 const game = new Game({ seed });
 for (const [type, x, y] of SCENARIOS[scenario]) game.floors[0].place(type, x, y);
-for (let i = 0; i < 4; i++) {
+// Garáž = začiatok hry: stôl a spoluzakladateľ ako v setupStarterOffice().
+if (scenario === 'garage') game.setupStarterOffice();
+const staff = scenario === 'garage' ? 0 : 4;
+for (let i = 0; i < staff; i++) {
   game.refreshCandidates();
-  game.hire(game.candidates[0]);
+  // Najlacnejší uchádzač – ako pri štarte hry.
+  game.hire(game.candidates.reduce((a, b) => (b.wage < a.wage ? b : a)));
 }
+// Nákup vybavenia nepočítame ako výdavok scenára.
+game.cash = Number(process.env.CASH ?? game.cash);
+game.economy.current = {};
 
 const counts = {};
 game.events.on('employee:drama', () => (counts.drama = (counts.drama ?? 0) + 1));
@@ -72,6 +88,9 @@ let breaksStarted = 0;
 const lastActivity = new Map();
 
 const launches = [];
+game.events.on('game:over', ({ reason }) =>
+  console.log(`!!! KONIEC HRY: ${reason} (deň ${game.clock.day})`),
+);
 let maxTickets = 0;
 game.events.on('product:launched', ({ score }) => launches.push(score));
 
@@ -127,7 +146,15 @@ console.log(
   `\nProdukty (${strategy}): vydané ${launches.length}, skóre ${launches.map((s) => s.toFixed(1)).join(', ') || '–'}`,
 );
 console.log(
-  `  hotovosť ${Math.round(game.cash)} € (bez miezd), tržby živých produktov ${totalRevenue} €, ` +
+  `  hotovosť ${Math.round(game.cash)} €, tržby živých produktov ${totalRevenue} €, ` +
     `škandál ${game.scandal.toFixed(1)} %, max. tiketov ${Math.round(maxTickets)}, ` +
     `trh hráč ${game.marketShare.player.toFixed(1)} %`,
 );
+
+console.log('\nMesačné výkazy (čistý zisk / hotovosť):');
+for (const r of game.economy.history) {
+  const parts = Object.entries(r.items)
+    .map(([k, v]) => `${k} ${Math.round(v)}`)
+    .join(', ');
+  console.log(`  mesiac ${r.month}: ${r.net} € → ${r.cash} €  (${parts})`);
+}

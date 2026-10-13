@@ -34,6 +34,7 @@ const LIMEZU = {
   },
   coffee: { width: 12, height: 26, layers: [{ rect: [230, 533, 12, 26], at: [0, 0] }] },
   vending: { width: 18, height: 24, layers: [{ rect: [72, 384, 18, 24], at: [0, 0] }] },
+  couch: { width: 31, height: 24, layers: [{ rect: [1, 276, 31, 24], at: [0, 0] }] },
 };
 
 /**
@@ -108,6 +109,16 @@ const PAINTERS = {
     rect(ctx, '#d84a3a', 11, 3, 1, 1); // kontrolka
     rect(ctx, '#0d0d0f', 6, 8, 4, 3); // výpust
     rect(ctx, '#f2efe6', 6, 11, 4, 3); // šálka
+  },
+  couch(ctx) {
+    rect(ctx, '#3d5a8a', 1, 6, 30, 8); // operadlo
+    rect(ctx, '#4f6fa8', 1, 13, 30, 8); // sedák
+    rect(ctx, '#2f4670', 0, 8, 3, 14); // opierky
+    rect(ctx, '#2f4670', 29, 8, 3, 14);
+    rect(ctx, '#5a7cbb', 4, 14, 11, 2);
+    rect(ctx, '#5a7cbb', 17, 14, 11, 2);
+    rect(ctx, '#1d1e22', 2, 22, 2, 2); // nohy
+    rect(ctx, '#1d1e22', 28, 22, 2, 2);
   },
   vending(ctx) {
     rect(ctx, '#8f2c2c', 1, 0, 14, 24);

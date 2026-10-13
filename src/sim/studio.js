@@ -173,10 +173,10 @@ export class Studio {
       } else {
         revenue *= Math.max(0, 1 - product.age / type.lifetime);
       }
-      revenue = Math.round(revenue);
+      revenue = Math.round(revenue * game.scandalRevenueFactor());
       product.revenueToday = revenue;
       product.totalRevenue += revenue;
-      game.cash += revenue;
+      game.earn(revenue, 'revenue');
       if (model.scandalPerDay) game.addScandal(model.scandalPerDay);
       product.age++;
     }

@@ -3,6 +3,9 @@
 /** Tier 1 (suterén) – max. počet zamestnancov. */
 export const MAX_STAFF_TIER1 = 4;
 
+/** Úvodný zamestnanec – spoluzakladateľ: priemerná zručnosť, nízky plat (mesačne, D5). */
+export const COFOUNDER = { SKILL: 1, WAGE: 600 };
+
 /** Počet uchádzačov v ponuke; obnovujú sa každý týždeň. */
 export const CANDIDATE_COUNT = 3;
 

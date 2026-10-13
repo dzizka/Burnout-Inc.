@@ -1,10 +1,11 @@
-import { ECONOMY, MARKET } from '../data/balance.js';
+import { ECONOMY, MARKET, SCANDAL } from '../data/balance.js';
 import { OBJECTS, SELL_REFUND_RATIO } from '../data/objects.js';
 import { BEHAVIOR, DECAY, DECAY_VARIATION, PLAYER_ACTIONS, CRITICAL } from '../data/needs.js';
 import { SUPPORT } from '../data/products.js';
 import {
   CANDIDATE_COUNT,
   CHARACTER_VARIANTS,
+  COFOUNDER,
   HAIR_COLORS,
   MAX_STAFF_TIER1,
   NAMES,
@@ -22,6 +23,7 @@ import { Floor, PlaceError } from './floor.js';
 import { Employee, Activity } from './employee.js';
 import { findPath } from './pathfinding.js';
 import { Studio } from './studio.js';
+import { Economy, Category } from './economy.js';
 
 // Koreň herného stavu. Čistá logika bez DOM – beží aj v testoch (Node).
 
@@ -54,25 +56,87 @@ export class Game {
     this.refreshCandidates();
     /** Vývoj produktov, vydané produkty a podpora (GDD kap. 6). */
     this.studio = new Studio();
+    /** Peňažné toky, úvery, bankrot (GDD kap. 9). */
+    this.economy = new Economy();
+    /** Koniec hry: null alebo { reason: 'bankrupt' | 'scandal' }. */
+    this.over = null;
   }
 
   /** @param {number} dt herné sekundy */
   update(dt) {
+    if (this.over) return;
     for (const employee of this.employees) employee.update(dt, this);
     this.studio.update(dt, this);
     this.applyRinging(dt);
     const ended = this.clock.tick(dt);
     if (ended.dayEnded) {
       this.studio.onDayEnd(this);
+      this.addScandal(-SCANDAL.DECAY_PER_DAY);
       this.events.emit('day:end', { day: this.clock.day - 1 });
     }
     if (ended.weekEnded) {
       this.refreshCandidates();
       this.events.emit('week:end', {});
     }
-    // Mesačná uzávierka: mzdy, nájom, úroky (D5) – implementácia v M4.
-    if (ended.monthEnded) this.events.emit('month:end', { month: this.clock.monthIndex - 1 });
+    if (ended.monthEnded) this.closeMonth(this.clock.monthIndex - 1);
     if (ended.yearEnded) this.events.emit('year:end', { year: this.clock.year - 1 });
+  }
+
+  // --- peniaze (GDD kap. 9) --------------------------------------------------------
+
+  earn(amount, category) {
+    this.cash += amount;
+    this.economy.record(category, amount);
+  }
+
+  spend(amount, category) {
+    this.cash -= amount;
+    this.economy.record(category, -amount);
+  }
+
+  /** Mesačná uzávierka: mzdy (D5), nájom, splátky (D13), razie, bankrot (D12). */
+  closeMonth(month) {
+    if (this.scandal >= SCANDAL.RAID) this.spend(SCANDAL.RAID_FINE, Category.FINES);
+    const { report, bankrupt, warning } = this.economy.closeMonth(this, month);
+    this.events.emit('month:end', { month, report, warning });
+    if (bankrupt) this.endGame('bankrupt');
+  }
+
+  takeLoan() {
+    return this.economy.takeLoan(this);
+  }
+
+  endGame(reason) {
+    if (this.over) return;
+    this.over = { reason };
+    this.events.emit('game:over', this.over);
+  }
+
+  /** GDD 6.5 – škandál znižuje predaje. */
+  scandalRevenueFactor() {
+    if (this.scandal >= SCANDAL.RAID) return SCANDAL.RAID_REVENUE_FACTOR;
+    if (this.scandal >= SCANDAL.MEDIA) return SCANDAL.MEDIA_REVENUE_FACTOR;
+    return 1;
+  }
+
+  /** GDD 9.4 – cena PR kampane rastie s úrovňou škandálu. */
+  prCost() {
+    return Math.round(SCANDAL.PR_BASE_COST * (1 + this.scandal * SCANDAL.PR_COST_PER_PERCENT));
+  }
+
+  prCampaign() {
+    const cost = this.prCost();
+    if (this.scandal <= 0 || !this.canAfford(cost)) return false;
+    this.spend(cost, Category.PR);
+    this.addScandal(-SCANDAL.PR_REDUCTION);
+    return true;
+  }
+
+  /** GDD 6.5 – obetný baránok: vyhodí zamestnanca verejne, škandál klesne, tím trpí. */
+  scapegoat(employee) {
+    this.fire(employee);
+    this.addScandal(-SCANDAL.SCAPEGOAT_REDUCTION);
+    for (const e of this.employees) e.stats.morale *= SCANDAL.SCAPEGOAT_MORALE_FACTOR;
   }
 
   // --- stavanie ------------------------------------------------------------------
@@ -104,7 +168,7 @@ export class Game {
     const error = this.checkPlacement(floorIndex, type, x, y);
     if (error) return { ok: false, error };
     if (!this.canAfford(def.price)) return { ok: false, error: BuyError.NO_MONEY };
-    this.cash -= def.price;
+    this.spend(def.price, Category.PURCHASES);
     const object = this.floors[floorIndex].place(type, x, y);
     this.events.emit('object:placed', { floorIndex, object });
     return { ok: true, object };
@@ -114,7 +178,7 @@ export class Game {
   sellObject(floorIndex, object) {
     const refund = Math.floor(OBJECTS[object.type].price * SELL_REFUND_RATIO);
     this.floors[floorIndex].remove(object);
-    this.cash += refund;
+    this.earn(refund, Category.ASSET_SALES);
     for (const e of this.employees) e.onObjectRemoved(object, this);
     this.events.emit('object:sold', { floorIndex, object, refund });
     return refund;
@@ -184,7 +248,7 @@ export class Game {
   /** Bonus 100 € – okamžitý reset Morálky (GDD 8.2). */
   giveBonus(employee) {
     if (!this.canAfford(PLAYER_ACTIONS.BONUS_COST)) return false;
-    this.cash -= PLAYER_ACTIONS.BONUS_COST;
+    this.spend(PLAYER_ACTIONS.BONUS_COST, Category.BONUSES);
     employee.stats.morale = 100;
     return true;
   }
@@ -285,9 +349,10 @@ export class Game {
     return this.studio.handleTickets(employee, amount, dt);
   }
 
-  /** Škandál 0–100 % (GDD 6.5). */
+  /** Škandál 0–100 % (GDD 6.5); 100 % = likvidácia. */
   addScandal(amount) {
-    this.scandal = Math.max(0, Math.min(100, this.scandal + amount));
+    this.scandal = Math.max(0, Math.min(SCANDAL.LIQUIDATION, this.scandal + amount));
+    if (this.scandal >= SCANDAL.LIQUIDATION) this.endGame('scandal');
   }
 
   /** Stoly podpory, ktoré práve zvonia (sú nevybavené tikety). */
@@ -310,10 +375,11 @@ export class Game {
     }
   }
 
-  /** Úvodná kancelária: zadarmo stôl a jeden zamestnanec, aby hra hneď žila. */
+  /** Úvodná kancelária: zadarmo stôl a spoluzakladateľ s nízkym platom, aby hra hneď žila. */
   setupStarterOffice() {
     const floor = this.floors[0];
     floor.place('desk', 3, 2);
-    this.hire(this.candidates[0]);
+    const cofounder = { ...this.generateCandidate(), skill: COFOUNDER.SKILL, wage: COFOUNDER.WAGE };
+    this.hire(cofounder);
   }
 }

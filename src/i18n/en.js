@@ -96,6 +96,8 @@ export default {
   'toast.hyper': '{name} is on a caffeine rush and works for three!',
   'toast.hygiene': '{name}: hygiene disaster. The whole office suffers.',
   'toast.noBreak': "Can't take a break now – there's nowhere to go.",
+  'object.couch': 'Lounge couch',
+  'activity.LOUNGE': 'Chilling on the couch',
   'object.support': 'Support desk',
   'product.mobileApp': 'Addictive mobile app',
   'product.mobileApp.desc': 'Small starter project. Microtransactions behind every button.',

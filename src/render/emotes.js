@@ -72,6 +72,7 @@ const ACTIVITY_ICON = {
   [Activity.DRAMA_QUEEN]: 'bang',
   [Activity.ASLEEP]: 'zzz',
   [Activity.SLACKING]: 'ball',
+  [Activity.LOUNGE]: 'ball',
   [Activity.HYPERACTIVE]: 'bolt',
   [Activity.STRIKE]: 'dollar',
   [Activity.IDLE]: 'question',

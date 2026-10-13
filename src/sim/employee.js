@@ -9,6 +9,7 @@ import {
 } from '../data/needs.js';
 import { findPath } from './pathfinding.js';
 import { OBJECTS } from '../data/objects.js';
+import { ECONOMY } from '../data/balance.js';
 
 // Zamestnanec: 6 potrieb (100 → 0) a stavový automat (GDD 4.1–4.3).
 // Pozícia je v dlaždiciach; celé čísla = stred dlaždice.
@@ -21,6 +22,7 @@ export const Activity = Object.freeze({
   VENDING_MACHINE: 'VENDING_MACHINE',
   TOILET: 'TOILET',
   SMOKE_BREAK: 'SMOKE_BREAK',
+  LOUNGE: 'LOUNGE',
   PRANK_COWORKER: 'PRANK_COWORKER',
   DRAMA_QUEEN: 'DRAMA_QUEEN',
   ASLEEP: 'ASLEEP',
@@ -33,6 +35,7 @@ const BREAK_ACTIVITIES = new Set([
   Activity.VENDING_MACHINE,
   Activity.TOILET,
   Activity.SMOKE_BREAK,
+  Activity.LOUNGE,
 ]);
 
 /** Činnosti, pri ktorých zamestnanec sedí pri stole. */
@@ -291,8 +294,8 @@ export class Employee {
     for (const need of NEED_PRIORITY) {
       if (s[need] >= CRITICAL) continue;
       if (need === 'fun') {
-        if (this.chaosCooldown > 0) continue;
-        if (this.startPrank(game)) return;
+        if (this.startBreak(game, need)) return;
+        if (this.chaosCooldown === 0 && this.startPrank(game)) return;
       } else if (this.startBreak(game, need)) {
         return;
       }
@@ -350,6 +353,7 @@ export class Employee {
     const need = this.targetNeed;
     const objType = this.target.type;
     this.stats[need] = 100;
+    if (objType === 'coffee') game.spend(ECONOMY.COFFEE_COST, 'coffee');
     if (need === 'peace') {
       if (objType === 'toilet') game.smokeInToilet(this);
     } else {

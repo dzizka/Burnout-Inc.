@@ -97,6 +97,8 @@ export default {
   'toast.hyper': '{name} má kofeínový šok a pracuje za troch!',
   'toast.hygiene': '{name}: hygienická katastrofa. Kancelária trpí.',
   'toast.noBreak': 'Teraz sa prestávka nedá – nie je kam ísť.',
+  'object.couch': 'Gauč',
+  'activity.LOUNGE': 'Relaxuje na gauči',
   'object.support': 'Stôl podpory',
   'product.mobileApp': 'Návyková mobilná appka',
   'product.mobileApp.desc': 'Malý projekt na rozbeh. Mikrotransakcie v každom tlačidle.',
