@@ -29,11 +29,12 @@ pokračujú poschodia, rival, Black Ops a meta-progres.
 - DRAMA_QUEEN s AoE efektom, ikony nad hlavou
 - Karta zamestnanca (inšpekcia), nábor s mesačným platom, balansová simulácia `npm run sim`
 
-## M3 – Produkt & Support (GDD fáza 3)
+## M3 – Produkt & Support (GDD fáza 3) ✅
 
 - Projekt „Garážová appka“, modré body vs. červené bugy
 - Rozhodnutie Ship it / Polish, tržby s útlmom
-- Tikety, zvoniaci stôl podpory, hluk
+- Tikety, zvoniaci stôl podpory, hluk, hotfixy živých produktov
+- 3 typy produktov kampane 1 × 3 biznis modely, panel Projekty
 
 ## M4 – Ekonomika & uloženie (GDD fáza 4)
 

@@ -1,6 +1,7 @@
 import { ECONOMY, MARKET } from '../data/balance.js';
 import { OBJECTS, SELL_REFUND_RATIO } from '../data/objects.js';
 import { BEHAVIOR, DECAY, DECAY_VARIATION, PLAYER_ACTIONS, CRITICAL } from '../data/needs.js';
+import { SUPPORT } from '../data/products.js';
 import {
   CANDIDATE_COUNT,
   CHARACTER_VARIANTS,
@@ -20,6 +21,7 @@ import { FloorGrid } from './grid.js';
 import { Floor, PlaceError } from './floor.js';
 import { Employee, Activity } from './employee.js';
 import { findPath } from './pathfinding.js';
+import { Studio } from './studio.js';
 
 // Koreň herného stavu. Čistá logika bez DOM – beží aj v testoch (Node).
 
@@ -50,13 +52,20 @@ export class Game {
     this.workDone = 0;
     this.candidates = [];
     this.refreshCandidates();
+    /** Vývoj produktov, vydané produkty a podpora (GDD kap. 6). */
+    this.studio = new Studio();
   }
 
   /** @param {number} dt herné sekundy */
   update(dt) {
     for (const employee of this.employees) employee.update(dt, this);
+    this.studio.update(dt, this);
+    this.applyRinging(dt);
     const ended = this.clock.tick(dt);
-    if (ended.dayEnded) this.events.emit('day:end', { day: this.clock.day - 1 });
+    if (ended.dayEnded) {
+      this.studio.onDayEnd(this);
+      this.events.emit('day:end', { day: this.clock.day - 1 });
+    }
     if (ended.weekEnded) {
       this.refreshCandidates();
       this.events.emit('week:end', {});
@@ -219,7 +228,7 @@ export class Game {
     const taken = new Set(this.employees.map((e) => e.deskId));
     const desk = floor.objects.find(
       (o) =>
-        o.type === 'desk' &&
+        OBJECTS[o.type].seat &&
         !taken.has(o.id) &&
         findPath(floor, employee.tile, floor.interactionTile(o)) !== null,
     );
@@ -265,8 +274,40 @@ export class Game {
     }
   }
 
-  addWork(_employee, amount) {
+  /** Práca pri vývojárskom stole (body vývoja / opravy bugov). */
+  addWork(employee, amount) {
     this.workDone += amount;
+    this.studio.addWork(amount, employee, this);
+  }
+
+  /** Práca pri stole podpory (vybavovanie tiketov). */
+  handleTickets(employee, amount, dt) {
+    return this.studio.handleTickets(employee, amount, dt);
+  }
+
+  /** Škandál 0–100 % (GDD 6.5). */
+  addScandal(amount) {
+    this.scandal = Math.max(0, Math.min(100, this.scandal + amount));
+  }
+
+  /** Stoly podpory, ktoré práve zvonia (sú nevybavené tikety). */
+  ringingDesks(floorIndex = 0) {
+    if (this.studio.pendingTickets <= 0) return [];
+    return this.floors[floorIndex].objects.filter((o) => OBJECTS[o.type].seat === 'support');
+  }
+
+  /** GDD 6.2A – zvoniace telefóny znižujú Pokoj všetkým v okruhu (AoE hluk). */
+  applyRinging(dt) {
+    for (let f = 0; f < this.floors.length; f++) {
+      for (const desk of this.ringingDesks(f)) {
+        for (const e of this.employees) {
+          if (e.floorIndex !== f) continue;
+          if (Math.hypot(e.x - desk.x, e.y - desk.y) <= SUPPORT.RING_RADIUS) {
+            e.stats.peace = Math.max(0, e.stats.peace - SUPPORT.RING_PEACE_S * dt);
+          }
+        }
+      }
+    }
   }
 
   /** Úvodná kancelária: zadarmo stôl a jeden zamestnanec, aby hra hneď žila. */

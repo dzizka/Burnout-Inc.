@@ -11,6 +11,7 @@
  * @property {number} price
  * @property {{ dx: number, dy: number }} interaction
  * @property {string} [need] potreba, ktorú objekt dopĺňa (pre AI v M2)
+ * @property {'dev' | 'support'} [seat] pracovné miesto – vývojár alebo operátor podpory
  */
 
 /** @type {Record<string, ObjectDef>} */
@@ -22,6 +23,17 @@ export const OBJECTS = {
     height: 1,
     price: 100,
     interaction: { dx: 0, dy: 1 },
+    seat: 'dev',
+  },
+  support: {
+    // GDD 6.2 – stôl zákazníckej podpory s telefónom; pri tiketoch zvoní a robí hluk.
+    id: 'support',
+    category: 'work',
+    width: 1,
+    height: 1,
+    price: 150,
+    interaction: { dx: 0, dy: 1 },
+    seat: 'support',
   },
   coffee: {
     id: 'coffee',

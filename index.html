@@ -36,6 +36,9 @@
             <div class="scandal-bar"><div id="scandal-fill"></div></div>
             <span id="scandal-value"></span>
           </div>
+          <div class="stat" id="tickets-stat" data-i18n-title="hud.tickets" hidden>
+            <span>☎</span><span id="tickets-value"></span>
+          </div>
           <div id="time-controls">
             <button data-speed="0" data-i18n-title="time.pause">❚❚</button>
             <button data-speed="1">▶</button>
@@ -55,6 +58,21 @@
           </div>
           <div id="build-items"></div>
           <p class="hint" data-i18n="build.hint"></p>
+        </section>
+
+        <section id="projects-panel" class="dock-panel" hidden>
+          <div class="panel-header">
+            <span data-i18n="projects.title"></span>
+            <button id="btn-projects-close" data-i18n-title="build.close">×</button>
+          </div>
+          <div class="projects-cols">
+            <div id="project-area"></div>
+            <div>
+              <h3 data-i18n="projects.live"></h3>
+              <div id="product-list"></div>
+              <p id="tickets-line" class="note"></p>
+            </div>
+          </div>
         </section>
 
         <section id="staff-panel" class="dock-panel" hidden>

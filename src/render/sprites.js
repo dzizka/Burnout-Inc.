@@ -23,6 +23,15 @@ const LIMEZU = {
       { rect: [224, 208, 16, 16], at: [0, 2] }, // monitor
     ],
   },
+  support: {
+    width: 16,
+    height: 31,
+    layers: [
+      { rect: [80, 288, 16, 21], at: [0, 10] }, // stôl
+      { rect: [224, 424, 16, 8], at: [0, 9] }, // notebook
+      { rect: [162, 152, 12, 8], at: [4, 12] }, // telefón
+    ],
+  },
   coffee: { width: 12, height: 26, layers: [{ rect: [230, 533, 12, 26], at: [0, 0] }] },
   vending: { width: 18, height: 24, layers: [{ rect: [72, 384, 18, 24], at: [0, 0] }] },
 };
@@ -73,6 +82,19 @@ const PAINTERS = {
     rect(ctx, '#7fd0c8', 5, 5, 3, 1);
     rect(ctx, '#d8d0b8', 6, 13, 4, 2); // stojan
     rect(ctx, '#cfcfcf', 4, 15, 8, 2); // klávesnica
+  },
+  support(ctx, assets) {
+    if (assets.indoor) {
+      drawTile(ctx, assets.indoor, SHEETS.indoor, INDOOR.TABLE, 0, OVERHANG);
+    } else {
+      rect(ctx, '#3a2a1c', 1, 18, 14, 6);
+      rect(ctx, '#8a6a46', 0, 13, 16, 6);
+    }
+    rect(ctx, '#2a2c33', 2, 9, 7, 5); // notebook
+    rect(ctx, '#4f8fd8', 3, 10, 5, 3);
+    rect(ctx, '#c6443c', 10, 11, 5, 3); // telefón
+    rect(ctx, '#8f2c2c', 10, 10, 5, 1);
+    rect(ctx, '#e8e6e1', 11, 12, 1, 1);
   },
   coffee(ctx, assets) {
     if (assets.indoor) {

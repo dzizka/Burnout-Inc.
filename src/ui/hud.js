@@ -40,6 +40,8 @@ export class Hud {
       scandalValue: document.getElementById('scandal-value'),
       speedButtons: document.querySelectorAll('[data-speed]'),
       langButton: document.getElementById('btn-lang'),
+      ticketsStat: document.getElementById('tickets-stat'),
+      ticketsValue: document.getElementById('tickets-value'),
       toast: document.getElementById('toast'),
     };
 
@@ -56,7 +58,7 @@ export class Hud {
     });
 
     document
-      .querySelectorAll('#bottom-dock button:not(#tab-build):not(#tab-staff)')
+      .querySelectorAll('#bottom-dock button:not(#tab-build):not(#tab-staff):not(#tab-rd)')
       .forEach((btn) => btn.addEventListener('click', () => this.toast(t('toast.comingSoon'))));
 
     game.events.on('month:end', ({ month }) => this.toast(t('toast.monthEnd', { month })));
@@ -119,6 +121,9 @@ export class Hud {
     setText(el.scandalValue, `${Math.round(game.scandal)} %`);
     el.scandalFill.parentElement.classList.toggle('danger', game.scandal >= 70);
     setText(el.langButton, getLocale().toUpperCase());
+    const tickets = Math.round(game.studio.pendingTickets);
+    el.ticketsStat.hidden = tickets < 1;
+    setText(el.ticketsValue, String(tickets));
   }
 }
 
