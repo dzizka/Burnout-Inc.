@@ -6,3 +6,7 @@ coverage/
 .vite/
 # Capacitor (neskôr)
 android/app/build/
+
+# Platené assety (LimeZu) – licencia zakazuje šírenie, NIKDY necommitovať.
+# Do hry sa pribalia pri deployi zo súkromného repa (docs/ASSETS.md).
+public/assets/limezu/

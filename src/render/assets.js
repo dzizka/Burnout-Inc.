@@ -8,6 +8,13 @@ export const SHEETS = {
   urban: { url: 'assets/kenney/urban.png', tile: 16, spacing: 0, cols: 27 },
   /** Kenney Emotes Pack, pixel štýl 1 – 16×16, 10 stĺpcov. */
   emotes: { url: 'assets/kenney/emotes.png', tile: 16, spacing: 0, cols: 10 },
+  /**
+   * LimeZu Modern Office (platené) – v repe NIE JE, pribalí sa pri deployi zo súkromného
+   * repa. Objekty nie sú zarovnané na mriežku, preto sa z neho reže podľa pixelov.
+   */
+  lzOffice: { url: 'assets/limezu/office.png', tile: 16, spacing: 0, cols: 16 },
+  /** LimeZu Room Builder Office (platené) – steny a podlahy. */
+  lzRoom: { url: 'assets/limezu/room.png', tile: 16, spacing: 0, cols: 16 },
 };
 
 /** Ľavý horný roh dlaždice s poradovým číslom `id` v spritesheete. */
@@ -18,11 +25,12 @@ export function frameRect(sheet, id) {
 
 /**
  * @typedef {{ indoor: HTMLImageElement | null, urban: HTMLImageElement | null,
- *             emotes: HTMLImageElement | null }} Assets
+ *             emotes: HTMLImageElement | null, lzOffice: HTMLImageElement | null,
+ *             lzRoom: HTMLImageElement | null }} Assets
  */
 
 /** Prázdna sada – renderer kreslí náhradnú grafiku. */
-export const NO_ASSETS = { indoor: null, urban: null, emotes: null };
+export const NO_ASSETS = { indoor: null, urban: null, emotes: null, lzOffice: null, lzRoom: null };
 
 function loadImage(url) {
   return new Promise((resolve) => {

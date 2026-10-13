@@ -20,8 +20,24 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Fine-grained token s právom Contents: Read na súkromné repo s platenými assetmi.
+      # Bez neho sa hra nasadí s Kenney grafikou (docs/ASSETS.md).
+      ASSETS_TOKEN: ${{ secrets.ASSETS_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+      - name: Stiahnuť platené assety (súkromné repo)
+        if: env.ASSETS_TOKEN != ''
+        uses: actions/checkout@v4
+        with:
+          repository: dzizka/burnout-inc-assets
+          token: ${{ secrets.ASSETS_TOKEN }}
+          path: private-assets
+      - name: Pribaliť platené assety do hry
+        if: env.ASSETS_TOKEN != ''
+        run: |
+          mkdir -p public/assets/limezu
+          cp private-assets/limezu/office.png private-assets/limezu/room.png public/assets/limezu/
       - uses: actions/setup-node@v4
         with:
           node-version: 22

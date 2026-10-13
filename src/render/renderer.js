@@ -3,7 +3,7 @@ import { OBJECTS } from '../data/objects.js';
 import { Tile } from '../sim/grid.js';
 import { FRAMES, createTileset } from './tileset.js';
 import { NO_ASSETS } from './assets.js';
-import { createObjectSprites, OVERHANG } from './sprites.js';
+import { createObjectSprites, spriteOrigin } from './sprites.js';
 import { Camera } from './camera.js';
 import { drawEmployee, drawSelection, feetY } from './characters.js';
 import { drawEmote } from './emotes.js';
@@ -184,11 +184,12 @@ export class Renderer {
         sortY: (obj.y + OBJECTS[obj.type].height) * S,
         sortX: obj.x,
         draw: () => {
-          ctx.drawImage(this.sprites[obj.type], obj.x * S, obj.y * S - OVERHANG);
+          const sprite = this.sprites[obj.type];
+          const { dx, dy } = spriteOrigin(OBJECTS[obj.type], sprite);
+          ctx.drawImage(sprite, obj.x * S + dx, obj.y * S + dy);
           if (overlay.highlight === obj) {
-            const def = OBJECTS[obj.type];
             ctx.fillStyle = 'rgba(224, 83, 63, 0.45)';
-            ctx.fillRect(obj.x * S, obj.y * S - OVERHANG, def.width * S, def.height * S + OVERHANG);
+            ctx.fillRect(obj.x * S + dx, obj.y * S + dy, sprite.width, sprite.height);
           }
         },
       })),
@@ -232,7 +233,9 @@ export class Renderer {
     const { ghost } = overlay;
     if (!ghost) return;
     ctx.globalAlpha = ghost.valid ? 0.75 : 0.4;
-    ctx.drawImage(this.sprites[ghost.type], ghost.x * S, ghost.y * S - OVERHANG);
+    const sprite = this.sprites[ghost.type];
+    const { dx, dy } = spriteOrigin(OBJECTS[ghost.type], sprite);
+    ctx.drawImage(sprite, ghost.x * S + dx, ghost.y * S + dy);
     ctx.globalAlpha = 1;
   }
 
